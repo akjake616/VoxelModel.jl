@@ -1,0 +1,340 @@
+#region structs
+mutable struct Geometry
+    pos::Vector{Vector{<:Real}}
+    index::Int
+    const ID::Int
+end
+
+Base.@kwdef mutable struct Voxels
+    gridID::Array = []
+    dl::Vector{<:Real} = [1, 1, 1]
+    start::Vector{<:Real} = [shift_half * 1 / 2, shift_half * 1 / 2, shift_half * 1 / 2]
+end
+#endregion
+
+#region global constrols
+global shift_half = true
+global space = Voxels()
+
+global idCount = 0
+global idDict = Dict()
+
+global ref = true
+global canvas = nothing
+global layout = blank_layout()
+#endregion
+
+#region APIs
+"""
+    reset_voxel()
+
+    Reset the full voxel space. 
+"""
+function reset_voxel()
+    global space = Voxels()
+end
+
+"""
+    reset_ref(b::Bool)
+
+    Reset whether to show the refenrnce axes at the origin. The default is on. 
+"""
+function reset_ref(b::Bool)
+    global ref = b
+    plot_voxel(ref)
+end
+
+"""
+    reset_shift(b::Bool)
+
+    Reset `shift_half` to `b`. 
+"""
+function reset_shift(b::Bool)
+    global shift_half = b
+    global space = Voxels()
+end
+
+"""
+    reset_dl(dl::Vector{<: Real})
+
+    Reset the grid spacing to `dl`.
+"""
+function reset_dl(dl::Vector{<:Real})
+    @assert length(dl) == 3
+    start = [shift_half * 1 / 2 * dl[1], shift_half * 1 / 2 * dl[2], shift_half * 1 / 2 * dl[3]]
+    global space = Voxels([], dl, start)
+end
+
+"""
+    export_voxel()
+
+    Export the voxel space (struct Voxels).
+"""
+function export_voxel()
+    return space
+end
+
+"""
+    export_grid()
+
+    Export the grid array filled with color indexes. Note that when geometries coincide, index of the last-added geometry is taken. 
+"""
+function export_grid()
+    grid = zeros(Int, size(space.gridID))
+    for i in eachindex(grid)
+        if space.gridID[i] == []
+            grid[i] = 0
+        else
+            grid[i] = idDict[space.gridID[i][end]]
+        end
+    end
+    return grid
+end
+
+"""
+    create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
+
+    Create a cuboid with origin at `origin` and size `dim` (color index `ind`). `mode="corner"` is the default option; otherwise, one can choose `mode="center"`, which specifies the origin as the center of the cuboid.  `fac` denotes the interior densified factor according to the grid spacing. 
+"""
+function create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
+    @assert length(origin) == 3
+    @assert length(dim) == 3
+    @assert fac > 0
+
+    dx = space.dl[1]
+    dy = space.dl[2]
+    dz = space.dl[3]
+
+    sx = Int(_round((dim[1]-2*dx/fac) / (dx/fac))) + 1
+    sy = Int(_round((dim[2]-2*dy/fac) / (dy/fac))) + 1
+    sz = Int(_round((dim[3]-2*dz/fac) / (dz/fac))) + 1
+
+    pos = []
+
+    if mode == "center"
+        xs = origin[1] - dim[1]/2 + dx / fac
+        ys = origin[2] - dim[2]/2 + dy / fac
+        zs = origin[3] - dim[3]/2 + dz / fac
+    else
+        xs = origin[1] + dx / fac
+        ys = origin[2] + dy / fac
+        zs = origin[3] + dz / fac
+    end
+
+    for i in 1:sx, j in 1:sy, k in 1:sz
+        push!(pos, [xs + (i - 1) * dx/fac, ys + (j - 1) * dy/fac, zs + (k - 1) * dz/fac])
+    end
+
+    global idCount += 1
+    geo = Geometry(pos, ind, idCount)
+    idDict[idCount] = ind
+    _add_geom(geo)
+
+    _plot_voxel(ref)
+
+    return geo
+end
+
+"""
+    create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
+
+    Create a sphere with origin at `origin` and radius `radius` (color index `ind`).
+"""
+function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
+    @assert length(origin) == 3
+    @assert fac > 0
+
+    dx = space.dl[1]
+    dy = space.dl[2]
+    dz = space.dl[3]
+
+    sr = maximum([ceil(Int, radius / (dx/fac)), ceil(Int, radius / (dy/fac)), ceil(Int, radius / (dz/fac))])
+
+    pos = []
+    for i in -sr:sr, j in -sr:sr, k in -sr:sr
+
+        x1 = origin[1] + i * (dx/fac) 
+        y1 = origin[2] + j * (dy/fac) 
+        z1 = origin[3] + k * (dz/fac) 
+
+        if ((x1 - origin[1])./(radius-dx/fac))^2 + ((y1 - origin[2])./(radius-dy/fac))^2 + ((z1 - origin[3])./(radius-dz/fac))^2 < 1
+            push!(pos, [x1, y1, z1])
+        end
+    end
+
+    global idCount += 1
+    geo = Geometry(pos, ind, idCount)
+    idDict[idCount] = ind
+    _add_geom(geo)
+
+    _plot_voxel(ref)
+
+    return geo
+end
+
+"""
+    create_ellip(origin::Vector{<: Real}, par::Vector{<: Real}, ind::Int=1, fac::Real=2)
+
+    Create an ellipsoid with origin at `origin` and the length of the semi-axes `par` (color index `ind`).
+"""
+function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+    @assert length(origin) == 3
+    @assert length(par) == 3
+    @assert fac > 0
+
+    dx = space.dl[1]
+    dy = space.dl[2]
+    dz = space.dl[3]
+
+    sa = ceil(Int, par[1] / (dx/fac))
+    sb = ceil(Int, par[2] / (dy/fac))
+    sc = ceil(Int, par[3] / (dz/fac))
+
+    pos = []
+    for i in -sa:sa, j in -sb:sb, k in -sc:sc
+        x1 = origin[1] + i * (dx/fac) 
+        y1 = origin[2] + j * (dy/fac) 
+        z1 = origin[3] + k * (dz/fac) 
+
+        if ((x1 - origin[1]) / (par[1]-dx/fac))^2 + ((y1 - origin[2]) / (par[2]-dy/fac))^2 + ((z1 - origin[3]) / (par[3]-dz/fac))^2 < 1
+            push!(pos, [x1, y1, z1])
+        end
+    end
+
+    global idCount += 1
+    geo = Geometry(pos, ind, idCount)
+    idDict[idCount] = ind
+    _add_geom(geo)
+
+    _plot_voxel(ref)
+
+    return geo
+end
+
+"""
+    create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+
+    Create a cylinder with `radius` and `height` from the base `origin` (color index `ind`).
+"""
+function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+    @assert length(origin) == 3
+    @assert fac > 0
+
+    dx = space.dl[1]
+    dy = space.dl[2]
+    dz = space.dl[3]
+
+    sr = maximum([ceil(Int, radius / (dx/fac)), ceil(Int, radius / (dy/fac))])
+    sz = Int(_round((height-2*dz/fac) / (dz/fac))) + 1
+    pos = []
+    for i in -sr:sr, j in -sr:sr, k in 1:sz
+
+        x1 = origin[1] + i * (dx/fac) 
+        y1 = origin[2] + j * (dy/fac) 
+        z1 = origin[3] + k * (dz/fac) 
+
+        if ((x1 - origin[1])./(radius-dx/fac))^2 + ((y1 - origin[2])./(radius-dy/fac))^2  < 1
+            push!(pos, [x1, y1, z1])
+        end
+    end
+
+    global idCount += 1
+    geo = Geometry(pos, ind, idCount)
+    idDict[idCount] = ind
+    _add_geom(geo)
+
+    _plot_voxel(ref)
+
+    return geo
+end
+
+"""
+    trans!(geo::Geometry, dl::Vector{<: Real})
+    
+    Translate geometry with `dl`.
+"""
+function trans!(geo::Geometry, dl::Vector{<:Real})
+    @assert length(dl) == 3
+
+    _del_geom(geo)
+
+    for n in eachindex(geo.pos)
+        geo.pos[n][1] += dl[1]
+        geo.pos[n][2] += dl[2]
+        geo.pos[n][1] += dl[3]
+    end
+
+    _add_geom(geo)
+
+    _plot_voxel(ref)
+end
+
+"""
+    rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
+
+    Rotate geometry with angle = `ang` with respect to the axis `axis` according to the origin `origin`. If origin is not specified, then the rotation is conducted according to the center of the geometry.
+"""
+function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
+    @assert length(axis) == 3
+
+    _del_geom(geo)
+
+    axis = axis ./ norm(axis)
+    vrot = similar(geo.pos)
+    
+    if origin == [0] # rotation center set at the geometry center
+        origin = sum(geo.pos) ./ length(geo.pos)
+    else
+        @assert length(origin) == 3
+    end
+
+    for n in eachindex(vrot)
+        v = (geo.pos[n] .- origin)
+        vrot[n] = cosd(ang) * v + sind(ang) * cross(axis, v) + (1-cosd(ang)) * dot(axis, v) * axis
+        geo.pos[n] = vrot[n] .+ origin
+    end
+
+    _add_geom(geo)
+
+    _plot_voxel(ref)
+end
+
+"""
+    clear_geom(geo::Geometry)
+
+    Clear geometry from the voxel space.
+"""
+function clear_geom(geo::Geometry)
+
+    _del_geom(geo)
+    geo = nothing
+    _plot_voxel(ref)
+end
+
+"""
+    clear_geom(geoList::Vector{Geometry})
+
+    Clear geometries from the voxel space.
+"""
+function clear_geom(geoList::Vector{Geometry})
+
+    for i in eachindex(geoList)
+        _del_geom(geoList[i])
+        geoList[i] = nothing
+    end
+end
+
+"""
+    plot_voxel(addRef::Bool=true)
+
+    Plot the voxel space. If `addRef=false` the reference axes will not be added. Call this function if the plot window is closed accidentally. 
+"""
+function plot_voxel(addRef::Bool=true)
+    
+    global canvas = plot([mesh3d(x=0, y=0, z=0)], layout)
+    display(canvas)
+    
+    _plot_voxel(addRef)
+end
+#endregion
+
