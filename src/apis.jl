@@ -37,7 +37,10 @@ end
 """
     reset_ref(b::Bool)
 
-    Reset whether to show the refenrnce axes at the origin. The default is on. 
+    Toggles the display of the reference axes at the origin. The default state is `true` (axes visible).
+    
+    # Arguments
+    - `b::Bool`: Boolean value to set the visibility of the reference axes.
 """
 function reset_ref(b::Bool)
     global ref = b
@@ -47,7 +50,10 @@ end
 """
     reset_shift(b::Bool)
 
-    Reset `shift_half` to `b`. 
+    Sets the `shift_half` parameter to the specified boolean value `b`.
+    
+    # Arguments
+    - `b::Bool`: Boolean value to set the `shift_half` parameter.
 """
 function reset_shift(b::Bool)
     global shift_half = b
@@ -55,9 +61,12 @@ function reset_shift(b::Bool)
 end
 
 """
-    reset_dl(dl::Vector{<: Real})
+    reset_dl(dl::Vector{<:Real})
 
-    Reset the grid spacing to `dl`.
+    Updates the grid spacing to the specified vector `dl`.
+    
+    # Arguments
+    - `dl::Vector{<:Real}`: A vector containing the new grid spacing values.
 """
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
@@ -66,35 +75,16 @@ function reset_dl(dl::Vector{<:Real})
 end
 
 """
-    export_voxel()
+    create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
 
-    Export the voxel space (struct Voxels).
-"""
-function export_voxel()
-    return space
-end
-
-"""
-    export_grid()
-
-    Export the grid array filled with color indexes. Note that when geometries coincide, index of the last-added geometry is taken. 
-"""
-function export_grid()
-    grid = zeros(Int, size(space.gridID))
-    for i in eachindex(grid)
-        if space.gridID[i] == []
-            grid[i] = 0
-        else
-            grid[i] = idDict[space.gridID[i][end]]
-        end
-    end
-    return grid
-end
-
-"""
-    create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
-
-    Create a cuboid with origin at `origin` and size `dim` (color index `ind`). `mode="corner"` is the default option; otherwise, one can choose `mode="center"`, which specifies the origin as the center of the cuboid.  `fac` denotes the interior densified factor according to the grid spacing. 
+    Creates a cuboid with the specified parameters.
+    
+    # Arguments
+    - `origin::Vector{<:Real}`: The origin point of the cuboid.
+    - `dim::Vector{<:Real}`: The dimensions of the cuboid.
+    - `ind::Int=1`: The color index of the cuboid.
+    - `mode::String="corner"`: The mode specifying the cuboid's origin ("corner" or "center").
+    - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
 function create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
     @assert length(origin) == 3
@@ -138,7 +128,13 @@ end
 """
     create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
 
-    Create a sphere with origin at `origin` and radius `radius` (color index `ind`).
+    Creates a sphere with the specified parameters.
+    
+    # Arguments
+    - `origin::Vector{<:Real}`: The origin point of the sphere.
+    - `radius::Real`: The radius of the sphere.
+    - `ind::Int=1`: The color index of the sphere.
+    - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
 function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
     @assert length(origin) == 3
@@ -173,9 +169,15 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
 end
 
 """
-    create_ellip(origin::Vector{<: Real}, par::Vector{<: Real}, ind::Int=1, fac::Real=2)
+    create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
 
-    Create an ellipsoid with origin at `origin` and the length of the semi-axes `par` (color index `ind`).
+    Creates an ellipsoid with the specified parameters.
+    
+    # Arguments
+    - `origin::Vector{<:Real}`: The origin point of the ellipsoid.
+    - `par::Vector{<:Real}`: The lengths of the semi-axes.
+    - `ind::Int=1`: The color index of the ellipsoid.
+    - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
 function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
     @assert length(origin) == 3
@@ -214,7 +216,14 @@ end
 """
     create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
 
-    Create a cylinder with `radius` and `height` from the base `origin` (color index `ind`).
+    Creates a cylinder with the specified parameters.
+    
+    # Arguments
+    - `origin::Vector{<:Real}`: The base origin point of the cylinder.
+    - `radius::Real`: The radius of the cylinder.
+    - `height::Real`: The height of the cylinder.
+    - `ind::Int=1`: The color index of the cylinder.
+    - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
 function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
     @assert length(origin) == 3
@@ -249,9 +258,13 @@ function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::I
 end
 
 """
-    trans!(geo::Geometry, dl::Vector{<: Real})
+    trans!(geo::Geometry, dl::Vector{<:Real})
+
+    Translates the geometry by the specified vector `dl`.
     
-    Translate geometry with `dl`.
+    # Arguments
+    - `geo::Geometry`: The geometry to be translated.
+    - `dl::Vector{<:Real}`: The translation vector.
 """
 function trans!(geo::Geometry, dl::Vector{<:Real})
     @assert length(dl) == 3
@@ -272,7 +285,13 @@ end
 """
     rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
 
-    Rotate geometry with angle = `ang` with respect to the axis `axis` according to the origin `origin`. If origin is not specified, then the rotation is conducted according to the center of the geometry.
+    Rotates the geometry by the specified angle `ang` around the axis `axis` and origin `origin`.
+    
+    # Arguments
+    - `geo::Geometry`: The geometry to be rotated.
+    - `ang::Real`: The rotation angle.
+    - `axis::Vector{<:Real}`: The rotation axis.
+    - `origin::Vector{<:Real}=[0]`: The rotation origin. Defaults to the center of the geometry if not specified.
 """
 function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
     @assert length(axis) == 3
@@ -302,7 +321,10 @@ end
 """
     clear_geom(geo::Geometry)
 
-    Clear geometry from the voxel space.
+    Removes the specified geometry from the voxel space.
+    
+    # Arguments
+    - `geo::Geometry`: The geometry to be removed.
 """
 function clear_geom(geo::Geometry)
 
@@ -314,7 +336,10 @@ end
 """
     clear_geom(geoList::Vector{Geometry})
 
-    Clear geometries from the voxel space.
+    Removes the specified list of geometries from the voxel space.
+    
+    # Arguments
+    - `geoList::Vector{Geometry}`: The list of geometries to be removed.
 """
 function clear_geom(geoList::Vector{Geometry})
 
@@ -327,7 +352,10 @@ end
 """
     plot_voxel(addRef::Bool=true)
 
-    Plot the voxel space. If `addRef=false` the reference axes will not be added. Call this function if the plot window is closed accidentally. 
+    Plots the voxel space. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
+    
+    # Arguments
+    - `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
 """
 function plot_voxel(addRef::Bool=true)
     
@@ -335,6 +363,38 @@ function plot_voxel(addRef::Bool=true)
     display(canvas)
     
     _plot_voxel(addRef)
+end
+
+"""
+    export_voxel()
+
+    Exports the current voxel space as a `Voxels` struct.
+    
+    # Returns
+    - `Voxels`: The current voxel space.
+"""
+function export_voxel()
+    return space
+end
+
+"""
+    export_grid()
+
+    Exports the grid array filled with color indexes. Note that when geometries overlap, the index of the last-added geometry is used.
+    
+    # Returns
+    - `Array{Int}`: The grid array with color indexes.
+"""
+function export_grid()
+    grid = zeros(Int, size(space.gridID))
+    for i in eachindex(grid)
+        if space.gridID[i] == []
+            grid[i] = 0
+        else
+            grid[i] = idDict[space.gridID[i][end]]
+        end
+    end
+    return grid
 end
 #endregion
 
