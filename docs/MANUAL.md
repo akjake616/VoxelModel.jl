@@ -22,15 +22,23 @@ Base.@kwdef mutable struct Voxels
 end
  ```
 
-## Global Controls
+ In order to set the color of the geometry, one can edit the dict `colorDict`. The following is the `color_dict.jl` file:
 
-- `global shift_half = true`
-- `global space = Voxels()`
-- `global idCount = 0`
-- `global idDict = Dict()`
-- `global ref = true`
-- `global canvas = nothing`
-- `global layout = blank_layout()`
+ ```julia
+ colorDict = Dict{Int, String}()
+
+colorDict[1] = "blue"
+colorDict[2] = "green"
+colorDict[3] = "red"
+ ```
+
+The default index 1, 2, 3 are mapped to color blue, green and red, respectively. One can add new color mapping (or modify the default), for example:
+
+```julia
+colorDict[4] = "pink"
+ ```
+
+If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exported as `canvas` which can be used for further modifications. 
 
 ## APIs
 

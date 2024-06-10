@@ -1,4 +1,4 @@
-colorDict = Dict()
+colorDict = Dict{Int, String}()
 
 colorDict[1] = "blue"
 colorDict[2] = "green"

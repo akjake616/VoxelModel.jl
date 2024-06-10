@@ -3,8 +3,7 @@ using Combinatorics
 using LinearAlgebra
 using Combinatorics
 
-include("./meshgrid.jl")
-
+using MeshGrid
 
 # ******************** Easy 2D Plot ********************
 
