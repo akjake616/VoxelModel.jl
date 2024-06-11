@@ -1,4 +1,3 @@
-using Infiltrator
 ##region inner functionalitis
 function _plot_voxel(addRef::Bool=true)
     if isnothing(canvas)
@@ -27,71 +26,70 @@ function _plot_voxel(addRef::Bool=true)
     filter!(x -> x != [], id_index)
 
     for ind in eachindex(id_index)
-
-        ptsArray = []
-        for i in 1:nx, j in 1:ny, k in 1:nz
-
-            if space.gridID[i, j, k] == id_index[ind]
-
-                pts1 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
-                pts2 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
-                pts3 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
-                pts4 = [(i - 1.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
-                pts5 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 0.5) * dz + zmin]
-                pts6 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 0.5) * dz + zmin]
-                pts7 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
-                pts8 = [(i - 1.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
-
-                if i == 1 || space.gridID[i-1, j, k] == []
-                    push!(ptsArray, pts1)
-                    push!(ptsArray, pts4)
-                    push!(ptsArray, pts8)
-                    push!(ptsArray, pts5)
-                end
-                if i == nx || space.gridID[i+1, j, k] == []
-                    push!(ptsArray, pts2)
-                    push!(ptsArray, pts3)
-                    push!(ptsArray, pts7)
-                    push!(ptsArray, pts6)
-                end
-
-                if j == 1 || space.gridID[i, j-1, k] == []
-                    push!(ptsArray, pts1)
-                    push!(ptsArray, pts2)
-                    push!(ptsArray, pts6)
-                    push!(ptsArray, pts5)
-                end
-                if j == ny || space.gridID[i, j+1, k] == []
-                    push!(ptsArray, pts4)
-                    push!(ptsArray, pts3)
-                    push!(ptsArray, pts7)
-                    push!(ptsArray, pts8)
-                end
-
-                if k == 1 || space.gridID[i, j, k-1] == []
-                    push!(ptsArray, pts1)
-                    push!(ptsArray, pts2)
-                    push!(ptsArray, pts3)
-                    push!(ptsArray, pts4)
-                end
-                if k == nz || space.gridID[i, j, k+1] == []
-                    push!(ptsArray, pts5)
-                    push!(ptsArray, pts6)
-                    push!(ptsArray, pts7)
-                    push!(ptsArray, pts8)
+        if idDict[][id_index[ind][end]] != 0
+            ptsArray = []
+            for i in 1:nx, j in 1:ny, k in 1:nz
+    
+                if space.gridID[i, j, k] == id_index[ind]
+    
+                    pts1 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
+                    pts2 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
+                    pts3 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
+                    pts4 = [(i - 1.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
+                    pts5 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 0.5) * dz + zmin]
+                    pts6 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 0.5) * dz + zmin]
+                    pts7 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
+                    pts8 = [(i - 1.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
+    
+                    if i == 1 || space.gridID[i-1, j, k] == []
+                        push!(ptsArray, pts1)
+                        push!(ptsArray, pts4)
+                        push!(ptsArray, pts8)
+                        push!(ptsArray, pts5)
+                    end
+                    if i == nx || space.gridID[i+1, j, k] == []
+                        push!(ptsArray, pts2)
+                        push!(ptsArray, pts3)
+                        push!(ptsArray, pts7)
+                        push!(ptsArray, pts6)
+                    end
+    
+                    if j == 1 || space.gridID[i, j-1, k] == []
+                        push!(ptsArray, pts1)
+                        push!(ptsArray, pts2)
+                        push!(ptsArray, pts6)
+                        push!(ptsArray, pts5)
+                    end
+                    if j == ny || space.gridID[i, j+1, k] == []
+                        push!(ptsArray, pts4)
+                        push!(ptsArray, pts3)
+                        push!(ptsArray, pts7)
+                        push!(ptsArray, pts8)
+                    end
+    
+                    if k == 1 || space.gridID[i, j, k-1] == []
+                        push!(ptsArray, pts1)
+                        push!(ptsArray, pts2)
+                        push!(ptsArray, pts3)
+                        push!(ptsArray, pts4)
+                    end
+                    if k == nz || space.gridID[i, j, k+1] == []
+                        push!(ptsArray, pts5)
+                        push!(ptsArray, pts6)
+                        push!(ptsArray, pts7)
+                        push!(ptsArray, pts8)
+                    end
                 end
             end
+            voxel_obj = create_mesh(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
+    
+            addtraces!(canvas, voxel_obj)
+            sleep(0.1)
         end
-        voxel_obj = create_mesh(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
-
-        addtraces!(canvas, voxel_obj)
-        sleep(0.01)
     end
 end
 
 function _add_geom(geo::Geometry)
-
-    setrounding(BigFloat, RoundToZero)
 
     dx = space.dl[1]
     dy = space.dl[2]
@@ -145,11 +143,7 @@ function _add_geom(geo::Geometry)
         indz = _find_nearest(z, geo.pos[n][3])
         for i in eachindex(indx), j in eachindex(indy), k in eachindex(indz)
             if !(geo.ID in gridID_new[indx[i], indy[j], indz[k]])
-                if idDict[][geo.ID] != 0
-                    push!(gridID_new[indx[i], indy[j], indz[k]], geo.ID)
-                else 
-                    gridID_new[indx[i], indy[j], indz[k]] = [];
-                end
+                push!(gridID_new[indx[i], indy[j], indz[k]], geo.ID)
             end
         end
     end
@@ -185,8 +179,6 @@ function _del_geom(geo::Geometry, trim::Bool=true)
     z = collect(space.start[3]:dz:(ngz-1)*dz+space.start[3])
 
     for n in 1:np
-        # filter!(e -> e != geo.ID, space.gridID[findfirst(x .== geo.pos[n][1]), findfirst(y .== geo.pos[n][2]), findfirst(z .== geo.pos[n][3])])
-        # filter!(e -> e != geo.ID, space.gridID[_find_nearest(x, geo.pos[n][1]), _find_nearest(y, geo.pos[n][2]), _find_nearest(z, geo.pos[n][3])])
         indx = _find_nearest(x, geo.pos[n][1])
         indy = _find_nearest(y, geo.pos[n][2])
         indz = _find_nearest(z, geo.pos[n][3])
