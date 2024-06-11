@@ -8,20 +8,17 @@ end
 Base.@kwdef mutable struct Voxels
     gridID::Array = []
     dl::Vector{<:Real} = [1, 1, 1]
-    start::Vector{<:Real} = [shift_half * 1 / 2, shift_half * 1 / 2, shift_half * 1 / 2]
+    start::Vector{<:Real} = [shift_half[] * 1 / 2, shift_half[] * 1 / 2, shift_half[] * 1 / 2]
 end
 #endregion
 
-#region global constrols
-global shift_half = true
-global space = Voxels()
-
-global idCount = 0
-global idDict = Dict()
-
-global ref = true
+#region constrols
+const shift_half = Ref(true)
+const space = Voxels()
+const idCount = Ref{Int}(0)
+const idDict = Ref(Dict{Int, Int}())
+const ref = Ref(true)
 global canvas = nothing
-global layout = blank_layout()
 #endregion
 
 #region APIs
@@ -31,7 +28,7 @@ global layout = blank_layout()
     Reset the full voxel space. 
 """
 function reset_voxel()
-    global space = Voxels()
+    space = Voxels()
 end
 
 """
@@ -43,21 +40,21 @@ end
     - `b::Bool`: Boolean value to set the visibility of the reference axes.
 """
 function reset_ref(b::Bool)
-    global ref = b
-    plot_voxel(ref)
+    global ref[] = b
+    plot_voxel(ref[])
 end
 
 """
     reset_shift(b::Bool)
 
-    Sets the `shift_half` parameter to the specified boolean value `b`.
+    Sets the `shift_half[]` parameter to the specified boolean value `b`.
     
     # Arguments
-    - `b::Bool`: Boolean value to set the `shift_half` parameter.
+    - `b::Bool`: Boolean value to set the `shift_half[]` parameter.
 """
 function reset_shift(b::Bool)
-    global shift_half = b
-    global space = Voxels()
+    shift_half[] = b
+    space = Voxels()
 end
 
 """
@@ -70,8 +67,8 @@ end
 """
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
-    start = [shift_half * 1 / 2 * dl[1], shift_half * 1 / 2 * dl[2], shift_half * 1 / 2 * dl[3]]
-    global space = Voxels([], dl, start)
+    start = [shift_half[] * 1 / 2 * dl[1], shift_half[] * 1 / 2 * dl[2], shift_half[] * 1 / 2 * dl[3]]
+    space = Voxels([], dl, start)
 end
 
 """
@@ -115,12 +112,12 @@ function create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mo
         push!(pos, [xs + (i - 1) * dx/fac, ys + (j - 1) * dy/fac, zs + (k - 1) * dz/fac])
     end
 
-    global idCount += 1
-    geo = Geometry(pos, ind, idCount)
-    idDict[idCount] = ind
+    idCount[] += 1
+    geo = Geometry(pos, ind, idCount[])
+    idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 
     return geo
 end
@@ -158,12 +155,12 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
         end
     end
 
-    global idCount += 1
-    geo = Geometry(pos, ind, idCount)
-    idDict[idCount] = ind
+    idCount[] += 1
+    geo = Geometry(pos, ind, idCount[])
+    idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 
     return geo
 end
@@ -203,12 +200,12 @@ function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, f
         end
     end
 
-    global idCount += 1
-    geo = Geometry(pos, ind, idCount)
-    idDict[idCount] = ind
+    idCount[] += 1
+    geo = Geometry(pos, ind, idCount[])
+    idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 
     return geo
 end
@@ -247,12 +244,12 @@ function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::I
         end
     end
 
-    global idCount += 1
-    geo = Geometry(pos, ind, idCount)
-    idDict[idCount] = ind
+    idCount[] += 1
+    geo = Geometry(pos, ind, idCount[])
+    idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 
     return geo
 end
@@ -279,7 +276,7 @@ function trans!(geo::Geometry, dl::Vector{<:Real})
 
     _add_geom(geo)
 
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 end
 
 """
@@ -315,7 +312,7 @@ function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:R
 
     _add_geom(geo)
 
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 end
 
 """
@@ -330,7 +327,7 @@ function clear_geom(geo::Geometry)
 
     _del_geom(geo)
     geo = nothing
-    _plot_voxel(ref)
+    _plot_voxel(ref[])
 end
 
 """
@@ -359,7 +356,7 @@ end
 """
 function plot_voxel(addRef::Bool=true)
     
-    global canvas = plot([mesh3d(x=0, y=0, z=0)], layout)
+    global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
     display(canvas)
     
     _plot_voxel(addRef)
@@ -391,7 +388,7 @@ function export_grid()
         if space.gridID[i] == []
             grid[i] = 0
         else
-            grid[i] = idDict[space.gridID[i][end]]
+            grid[i] = idDict[][space.gridID[i][end]]
         end
     end
     return grid

@@ -1,11 +1,11 @@
+using Infiltrator
 ##region inner functionalitis
 function _plot_voxel(addRef::Bool=true)
-
     if isnothing(canvas)
-        global canvas = plot([mesh3d(x=0, y=0, z=0)], layout)
+        global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
         display(canvas)
     else
-        react!(canvas, [mesh3d(x=0, y=0, z=0)], layout)
+        react!(canvas, [mesh3d(x=0, y=0, z=0)], blank_layout())
     end
     if addRef
         add_ref_axes(canvas, [0, 0, 0], 1)
@@ -82,7 +82,7 @@ function _plot_voxel(addRef::Bool=true)
                 end
             end
         end
-        voxel_obj = create_mesh(ptsArray, 4, colorDict[idDict[id_index[ind][end]]])
+        voxel_obj = create_mesh(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
 
         addtraces!(canvas, voxel_obj)
         sleep(0.01)
@@ -112,13 +112,13 @@ function _add_geom(geo::Geometry)
         ngz = size(space.gridID, 3)
     end
 
-    xmin = _round((minimum([minimum(xrange), space.start[1]]) - shift_half*dx/2)/dx)*dx + shift_half*dx/2
-    ymin = _round((minimum([minimum(yrange), space.start[2]]) - shift_half*dy/2)/dy)*dy + shift_half*dy/2
-    zmin = _round((minimum([minimum(zrange), space.start[3]]) - shift_half*dz/2)/dz)*dz + shift_half*dz/2
+    xmin = _round((minimum([minimum(xrange), space.start[1]]) - shift_half[]*dx/2)/dx)*dx + shift_half[]*dx/2
+    ymin = _round((minimum([minimum(yrange), space.start[2]]) - shift_half[]*dy/2)/dy)*dy + shift_half[]*dy/2
+    zmin = _round((minimum([minimum(zrange), space.start[3]]) - shift_half[]*dz/2)/dz)*dz + shift_half[]*dz/2
 
-    xmax = _round((maximum([maximum(xrange), space.start[1] + (ngx - 1) * dx]) - shift_half*dx/2)/dx)*dx + shift_half*dx/2
-    ymax = _round((maximum([maximum(yrange), space.start[2] + (ngy - 1) * dy]) - shift_half*dy/2)/dy)*dy + shift_half*dy/2
-    zmax = _round((maximum([maximum(zrange), space.start[3] + (ngz - 1) * dz]) - shift_half*dz/2)/dz)*dz + shift_half*dz/2
+    xmax = _round((maximum([maximum(xrange), space.start[1] + (ngx - 1) * dx]) - shift_half[]*dx/2)/dx)*dx + shift_half[]*dx/2
+    ymax = _round((maximum([maximum(yrange), space.start[2] + (ngy - 1) * dy]) - shift_half[]*dy/2)/dy)*dy + shift_half[]*dy/2
+    zmax = _round((maximum([maximum(zrange), space.start[3] + (ngz - 1) * dz]) - shift_half[]*dz/2)/dz)*dz + shift_half[]*dz/2
 
     x = collect(xmin:dx:xmax)
     y = collect(ymin:dy:ymax)
@@ -145,7 +145,7 @@ function _add_geom(geo::Geometry)
         indz = _find_nearest(z, geo.pos[n][3])
         for i in eachindex(indx), j in eachindex(indy), k in eachindex(indz)
             if !(geo.ID in gridID_new[indx[i], indy[j], indz[k]])
-                if idDict[geo.ID] != 0
+                if idDict[][geo.ID] != 0
                     push!(gridID_new[indx[i], indy[j], indz[k]], geo.ID)
                 else 
                     gridID_new[indx[i], indy[j], indz[k]] = [];

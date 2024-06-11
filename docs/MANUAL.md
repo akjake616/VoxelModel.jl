@@ -18,14 +18,14 @@ end
 Base.@kwdef mutable struct Voxels
     gridID::Array = []
     dl::Vector{<:Real} = [1, 1, 1]
-    start::Vector{<:Real} = [shift_half * 1 / 2, shift_half * 1 / 2, shift_half * 1 / 2]
+    start::Vector{<:Real} = [shift_half[][] * 1 / 2, shift_half[][] * 1 / 2, shift_half[][] * 1 / 2]
 end
  ```
 
  In order to set the color of the geometry, one can edit the dict `colorDict`. The following is the `color_dict.jl` file:
 
  ```julia
- colorDict = Dict{Int, String}()
+const colorDict = Dict{Int, String}()
 
 colorDict[1] = "blue"
 colorDict[2] = "green"
@@ -74,10 +74,10 @@ ___
 reset_shift(b::Bool)
 ```
 
-Sets the `shift_half` parameter to the specified boolean value `b`.
+Sets the `shift_half[]` parameter to the specified boolean value `b`.
 
 #### Arguments
-- `b::Bool`: Boolean value to set the `shift_half` parameter.
+- `b::Bool`: Boolean value to set the `shift_half[]` parameter.
 
 ___
 

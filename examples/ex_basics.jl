@@ -2,6 +2,7 @@
 
 push!(LOAD_PATH, "../src")
 using VoxelModel
+using PlotlyJS
 using Infiltrator
 
 reset_voxel()
