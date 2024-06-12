@@ -14,10 +14,11 @@ end
 
 #region constrols
 const shift_half = Ref(true)
-const space = Voxels()
 const idCount = Ref{Int}(0)
 const idDict = Ref(Dict{Int, Int}())
 const ref = Ref(true)
+
+global space = Voxels()
 global canvas = nothing
 #endregion
 
@@ -28,7 +29,7 @@ global canvas = nothing
     Reset the full voxel space. 
 """
 function reset_voxel()
-    space = Voxels()
+    global space = Voxels()
 end
 
 """
@@ -40,7 +41,7 @@ end
     - `b::Bool`: Boolean value to set the visibility of the reference axes.
 """
 function reset_ref(b::Bool)
-    global ref[] = b
+    ref[] = b
     plot_voxel(ref[])
 end
 
@@ -54,7 +55,7 @@ end
 """
 function reset_shift(b::Bool)
     shift_half[] = b
-    space = Voxels()
+    global space = Voxels()
 end
 
 """
@@ -68,7 +69,7 @@ end
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
     start = [shift_half[] * 1 / 2 * dl[1], shift_half[] * 1 / 2 * dl[2], shift_half[] * 1 / 2 * dl[3]]
-    space = Voxels([], dl, start)
+    global space = Voxels([], dl, start)
 end
 
 """

@@ -81,7 +81,7 @@ function _plot_voxel(addRef::Bool=true)
                     end
                 end
             end
-            voxel_obj = create_mesh(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
+            voxel_obj = polygons(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
     
             addtraces!(canvas, voxel_obj)
             sleep(0.1)

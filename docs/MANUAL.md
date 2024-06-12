@@ -74,7 +74,7 @@ ___
 reset_shift(b::Bool)
 ```
 
-Sets the `shift_half[]` parameter to the specified boolean value `b`.
+Sets the `shift_half[]` parameter to the specified boolean value `b`. `shift_half[]` means whether to shift the center with half grid spacing. For example, if the spacing is `1`, the grid center will be at `-0.5, 0.5, 1.5, ...`. The default of `shift_half[]` is `true`. 
 
 #### Arguments
 - `b::Bool`: Boolean value to set the `shift_half[]` parameter.
