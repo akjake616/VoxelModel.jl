@@ -1,6 +1,6 @@
 # VoxelModel.jl
 
-`VoxelModel.jl` is a Julia module for creating, manipulating, and visualizing 3D voxel geometries. It provides functionalities to create geometric shapes, add or delete them from a voxel grid, and visualize the grid using [`PlotlyJS.jl`](https://github.com/JuliaPlots/PlotlyJS.jl). This project is dedicated to (hopefully) easy model creation in FDTD/PSTD simulations.
+`VoxelModel.jl` is a Julia module for creating, manipulating, and visualizing 3D voxel geometries. It provides functionalities to create geometric shapes, add or delete them from a voxel grid, and visualize the grid using [`PlotlyJS.jl`](https://github.com/JuliaPlots/PlotlyJS.jl) and [`PlotlyGeometries,jl`](https://github.com/akjake616/PlotlyGeometries.jl). This project is dedicated to (hopefully) easy model creation in FDTD/PSTD simulations.
 
 <p align="center">
   <img alt="VoxelModel.jl" src="./media/illus.png" width="50%" height="auto" />
@@ -19,22 +19,13 @@ Pkg.add("VoxelModel")
 
 Please go to the examples folder for quick understanding of how to use the module:
 
-```bash
-cd examples
-julia ex_basics.jl
-```
 
-This example code illustrates the basic functionalities of the module. To see how rotation works, please run the fllowing script in the examples folder:
+- `ex_basics.jl`: This example code illustrates the basic functionalities of the module. 
 
-```bash
-julia ex_rotation.jl
-```
+- `ex_rotation.jl`: See how rotation works.
 
-To create more complicated geometries, please refer to the following example which demonstrates the creation of a sphere hollowd by cylinders:
+- `ex_advanced.jl`: Create more complicated geometries. This example demonstrates the creation of a sphere hollowd by cylinders.
 
-```bash
-julia ex_advanced.jl
-```
 
 ## Usage
 
