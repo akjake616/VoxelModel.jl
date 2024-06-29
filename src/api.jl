@@ -1,28 +1,4 @@
-#region structs
-mutable struct Geometry
-    pos::Vector{Vector{<:Real}}
-    index::Int
-    const ID::Int
-end
-
-Base.@kwdef mutable struct Voxels
-    gridID::Array = []
-    dl::Vector{<:Real} = [1, 1, 1]
-    start::Vector{<:Real} = [shift_half[] * 1 / 2, shift_half[] * 1 / 2, shift_half[] * 1 / 2]
-end
-#endregion
-
-#region constrols
-const shift_half = Ref(true)
-const idCount = Ref{Int}(0)
-const idDict = Ref(Dict{Int, Int}())
-const ref = Ref(true)
-
-global space = Voxels()
-global canvas = nothing
-#endregion
-
-#region APIs
+#region API
 """
     reset_voxel()
 
@@ -73,7 +49,7 @@ function reset_dl(dl::Vector{<:Real})
 end
 
 """
-    create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
+    create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
 
     Creates a cuboid with the specified parameters.
     
@@ -84,7 +60,7 @@ end
     - `mode::String="corner"`: The mode specifying the cuboid's origin ("corner" or "center").
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
+function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
     @assert length(origin) == 3
     @assert length(dim) == 3
     @assert fac > 0

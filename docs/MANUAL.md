@@ -40,7 +40,7 @@ colorDict[4] = "pink"
 
 If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exported as `canvas` which can be used for further modifications. 
 
-## APIs
+## API
 
 ### reset_voxel
 
@@ -94,10 +94,10 @@ Updates the grid spacing to the specified vector `dl`.
 
 ___
 
-### create_cube
+### create_cuboid
 
 ```julia
-create_cube(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
+create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
 ```
 
 Creates a cuboid with the specified parameters.

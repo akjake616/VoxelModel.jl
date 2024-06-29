@@ -1,4 +1,4 @@
-##region inner functionalitis
+##region internal functionalities
 function _plot_voxel(addRef::Bool=true)
     if isnothing(canvas)
         global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
@@ -7,7 +7,7 @@ function _plot_voxel(addRef::Bool=true)
         react!(canvas, [mesh3d(x=0, y=0, z=0)], blank_layout())
     end
     if addRef
-        add_ref_axes(canvas, [0, 0, 0], 1)
+        add_ref_axes!(canvas, [0, 0, 0], 1)
     end
 
     dx = space.dl[1]
@@ -29,9 +29,7 @@ function _plot_voxel(addRef::Bool=true)
         if idDict[][id_index[ind][end]] != 0
             ptsArray = []
             for i in 1:nx, j in 1:ny, k in 1:nz
-    
                 if space.gridID[i, j, k] == id_index[ind]
-    
                     pts1 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
                     pts2 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
                     pts3 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
@@ -90,7 +88,6 @@ function _plot_voxel(addRef::Bool=true)
 end
 
 function _add_geom(geo::Geometry)
-
     dx = space.dl[1]
     dy = space.dl[2]
     dz = space.dl[3]
@@ -240,7 +237,6 @@ function _del_geom(geo::Geometry, trim::Bool=true)
 end
 
 function _del_geom(geoList::Vector{Geometry}, trim::Bool=true)
-
     for i in eachindex(geoList)
         _del_geom(geoList[i], trim)
     end
@@ -254,7 +250,6 @@ function _find_nearest(ary::Array{<:Number}, ele::Number)
 end
 
 function _round(num::Number)
-
     if num - floor(num) == 0.5
         if num < 0
             return floor(num)     

@@ -1,5 +1,6 @@
-## using the modeule
-push!(LOAD_PATH, "../src")
+using Pkg, Revise
+Pkg.activate("..")
+
 using VoxelModel
 
 reset_voxel()

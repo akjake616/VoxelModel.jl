@@ -1,17 +1,17 @@
-## using the modeule
+using Pkg, Revise
+Pkg.activate("..")
 
-push!(LOAD_PATH, "../src")
 using VoxelModel
 using Infiltrator
 
 reset_voxel()
 
-## create a cube with base at [3, 4, 0] and dimensions [1, 2, 3] (color index = 1)
-c1 = create_cube([0, 0, 0], [30, 20, 10], 1)
+## create a cuboid with base at [3, 4, 0] and dimensions [1, 2, 3] (color index = 1)
+c1 = create_cuboid([0, 0, 0], [30, 20, 10], 1)
 
 ## wait 5 secs
 for i in 1:5
-    println("rotate cube after $(6-i) sec...")
+    println("rotate cuboid after $(6-i) sec...")
     sleep(1)
 end
 
@@ -20,7 +20,7 @@ rot!(c1, 90, [1, 0, 0])
 
 ## wait 5 secs
 for i in 1:5
-    println("rotate cube after $(6-i) sec...")
+    println("rotate cuboid after $(6-i) sec...")
     sleep(1)
 end
 

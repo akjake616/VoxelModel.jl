@@ -1,14 +1,14 @@
-## using the modeule
+using Pkg, Revise
+Pkg.activate("..")
 
-push!(LOAD_PATH, "../src")
 using VoxelModel
 using PlotlyJS
 using Infiltrator
 
 reset_voxel()
 
-## create a cube with base at [3, 4, 0] and dimensions [4, 3, 2] (color index = 1)
-c1 = create_cube([0, 0, 0], [4, 3, 2], 1)
+## create a cuboid with base at [3, 4, 0] and dimensions [4, 3, 2] (color index = 1)
+c1 = create_cuboid([0, 0, 0], [4, 3, 2], 1)
 
 ## create a sphere with center at [0, 0, 8] and radius = 5 (color index = 2)
 s1 = create_sphere([0, 0, 8], 5, 2)
