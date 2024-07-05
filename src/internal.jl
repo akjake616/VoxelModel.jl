@@ -113,13 +113,13 @@ function _add_geom(geo::Geometry)
         ngz = size(space.gridID, 3)
     end
 
-    xmin = _round((minimum([minimum(xrange), space.start[1]]) - shift_half[]*dx/2)/dx)*dx + shift_half[]*dx/2
-    ymin = _round((minimum([minimum(yrange), space.start[2]]) - shift_half[]*dy/2)/dy)*dy + shift_half[]*dy/2
-    zmin = _round((minimum([minimum(zrange), space.start[3]]) - shift_half[]*dz/2)/dz)*dz + shift_half[]*dz/2
+    xmin = _round((minimum([minimum(xrange), space.start[1]]) - shift[]*dx/2)/dx)*dx + shift[]*dx/2
+    ymin = _round((minimum([minimum(yrange), space.start[2]]) - shift[]*dy/2)/dy)*dy + shift[]*dy/2
+    zmin = _round((minimum([minimum(zrange), space.start[3]]) - shift[]*dz/2)/dz)*dz + shift[]*dz/2
 
-    xmax = _round((maximum([maximum(xrange), space.start[1] + (ngx - 1) * dx]) - shift_half[]*dx/2)/dx)*dx + shift_half[]*dx/2
-    ymax = _round((maximum([maximum(yrange), space.start[2] + (ngy - 1) * dy]) - shift_half[]*dy/2)/dy)*dy + shift_half[]*dy/2
-    zmax = _round((maximum([maximum(zrange), space.start[3] + (ngz - 1) * dz]) - shift_half[]*dz/2)/dz)*dz + shift_half[]*dz/2
+    xmax = _round((maximum([maximum(xrange), space.start[1] + (ngx - 1) * dx]) - shift[]*dx/2)/dx)*dx + shift[]*dx/2
+    ymax = _round((maximum([maximum(yrange), space.start[2] + (ngy - 1) * dy]) - shift[]*dy/2)/dy)*dy + shift[]*dy/2
+    zmax = _round((maximum([maximum(zrange), space.start[3] + (ngz - 1) * dz]) - shift[]*dz/2)/dz)*dz + shift[]*dz/2
 
     x = collect(xmin:dx:xmax)
     y = collect(ymin:dy:ymax)

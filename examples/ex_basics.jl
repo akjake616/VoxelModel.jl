@@ -36,4 +36,4 @@ end
 clear_geom(c1)
 
 # export grid array with geometry indexes
-grid = export_grid()
+grid = export_grid();

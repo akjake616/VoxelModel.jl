@@ -21,22 +21,22 @@ end
 Base.@kwdef mutable struct Voxels
     gridID::Array{Vector} = []
     dl::Vector{Float64} = [1.0, 1.0, 1.0]
-    start::Vector{Float64} = [shift_half[] * 0.5, shift_half[] * 0.5, shift_half[] * 0.5]
+    start::Vector{Float64} = [shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]
 end
 #endregion
 
 #region constrols
-const shift_half = Ref(true)
+const shift = Ref(true)
+const refAxis = Ref(true)
 const idCount = Ref{Int}(0)
 const idDict = Ref(Dict{Int, Int}())
-const refAxis = Ref(true)
 
 global space = Voxels()
 global canvas = nothing
+const colorDict = Dict{Int, String}()
 #endregion
 
-include("./color_dict.jl")
-include("./api.jl")
-include("./internal.jl")
+include("api.jl")
+include("internal.jl")
 
 end

@@ -24,13 +24,13 @@ end
 """
     reset_shift(b::Bool)
 
-    Sets the `shift_half[]` parameter to the specified boolean value `b`.
+    Sets the `shift[]` parameter to the specified boolean value `b`.
     
     # Arguments
-    - `b::Bool`: Boolean value to set the `shift_half[]` parameter.
+    - `b::Bool`: Boolean value to set the `shift[]` parameter.
 """
 function reset_shift(b::Bool)
-    shift_half[] = b
+    shift[] = b
     global space = Voxels()
 end
 
@@ -44,7 +44,7 @@ end
 """
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
-    start = [shift_half[] * 1 / 2 * dl[1], shift_half[] * 1 / 2 * dl[2], shift_half[] * 1 / 2 * dl[3]]
+    start = [shift[] * 1 / 2 * dl[1], shift[] * 1 / 2 * dl[2], shift[] * 1 / 2 * dl[3]]
     global space = Voxels([], dl, start)
 end
 
