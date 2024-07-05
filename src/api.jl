@@ -17,8 +17,8 @@ end
     - `b::Bool`: Boolean value to set the visibility of the reference axes.
 """
 function reset_ref(b::Bool)
-    ref[] = b
-    plot_voxel(ref[])
+    refAxis[] = b
+    plot_voxel(refAxis[])
 end
 
 """
@@ -94,7 +94,7 @@ function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, 
     idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 
     return geo
 end
@@ -137,7 +137,7 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
     idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 
     return geo
 end
@@ -182,7 +182,7 @@ function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, f
     idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 
     return geo
 end
@@ -226,7 +226,7 @@ function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::I
     idDict[][idCount[]] = ind
     _add_geom(geo)
 
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 
     return geo
 end
@@ -253,7 +253,7 @@ function trans!(geo::Geometry, dl::Vector{<:Real})
 
     _add_geom(geo)
 
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 end
 
 """
@@ -289,7 +289,7 @@ function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:R
 
     _add_geom(geo)
 
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 end
 
 """
@@ -304,7 +304,7 @@ function clear_geom(geo::Geometry)
 
     _del_geom(geo)
     geo = nothing
-    _plot_voxel(ref[])
+    _plot_voxel(refAxis[])
 end
 
 """

@@ -79,6 +79,12 @@ function _plot_voxel(addRef::Bool=true)
                     end
                 end
             end
+            if !haskey(colorDict, idDict[][id_index[ind][end]])
+                r = round(Int, rand() * 255)
+                g = round(Int, rand() * 255)
+                b = round(Int, rand() * 255)
+                colorDict[idDict[][id_index[ind][end]]] = "rgb($r, $g, $b)"
+            end
             voxel_obj = polygons(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
     
             addtraces!(canvas, voxel_obj)

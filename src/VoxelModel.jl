@@ -29,7 +29,7 @@ end
 const shift_half = Ref(true)
 const idCount = Ref{Int}(0)
 const idDict = Ref(Dict{Int, Int}())
-const ref = Ref(true)
+const refAxis = Ref(true)
 
 global space = Voxels()
 global canvas = nothing
