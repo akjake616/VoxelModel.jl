@@ -1,9 +1,10 @@
 module VoxelModel
 
-export reset_voxel, reset_shift, reset_dl
-export create_cuboid, create_sphere, create_ellip, create_cylin
+export reset_voxel, plot_voxel, export_voxel, save_voxel, load_voxel
+export reset_shift, reset_dl
+export create_cuboid, create_sphere, create_ellipsoid, create_cylinder
 export trans!, rot!
-export clear_geom, plot_voxel, export_voxel, save_voxel, read_voxel
+export clear_geom
 export colorDict, canvas
 
 export gridID, idDict
@@ -13,6 +14,7 @@ using PlotlyGeometries
 using LinearAlgebra
 using Combinatorics
 using BatchAssign
+using JLD
 
 using Infiltrator
 

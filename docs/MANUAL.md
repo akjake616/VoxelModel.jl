@@ -6,37 +6,29 @@ The source folder is composed the main module `VoxelModel.jl`, the definition of
 
 ```julia
 mutable struct Geometry
-    pos::Vector{Vector{<:Real}}
+    pos::Vector{Vector{Float64}}
     index::Int
     const ID::Int
 end
 ```
 
- The `Voxels` struct represents the voxel grid array `gridID` whcih stores the geometry ID, with customizable grid spacing `dl` and start position `start`:
+ The `Voxels` struct represents the voxel space. The struct is composed of `grid`, which stores the grid array with the integer index as its element, with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
 
  ```julia
 Base.@kwdef mutable struct Voxels
-    gridID::Array = []
-    dl::Vector{<:Real} = [1, 1, 1]
-    start::Vector{<:Real} = [shift_half[][] * 1 / 2, shift_half[][] * 1 / 2, shift_half[][] * 1 / 2]
+    grid::Array{Int, 3} = zeros(1, 1, 1)
+    dl::Vector{Float64} = [1.0, 1.0, 1.0]
+    start::Vector{Float64} = [shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]
 end
  ```
 
- In order to set the color of the geometry, one can edit the dict `colorDict`. The following is the `color_dict.jl` file:
-
- ```julia
-const colorDict = Dict{Int, String}()
-
-colorDict[1] = "blue"
-colorDict[2] = "green"
-colorDict[3] = "red"
- ```
-
-The default index 1, 2, 3 are mapped to color blue, green and red, respectively. One can add new color mapping (or modify the default), for example:
+The indexes in `grid` are analogous to material indexes in FDTD/PSTD simulations. They are used to set the colors of the geometries. In order to set the color of the geometry, one can edit the dict `colorDict`, for example:
 
 ```julia
 colorDict[4] = "pink"
  ```
+
+sets the `grid` with value `4` as pink voxel. If the key is not found, a random color is assigned. 
 
 If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exported as `canvas` which can be used for further modifications. 
 

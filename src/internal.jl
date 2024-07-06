@@ -86,7 +86,7 @@ function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
             voxel_obj = polygons(ptsArray, 4, colorDict[idDict[id_list[ind][end]]])
     
             addtraces!(canvas, voxel_obj)
-            sleep(0.01)
+            sleep(0.05)
         end
     end
 end

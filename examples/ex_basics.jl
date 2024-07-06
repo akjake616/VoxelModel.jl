@@ -14,7 +14,7 @@ c1 = create_cuboid([0, 0, 0], [4, 3, 2], 1)
 s1 = create_sphere([0, 0, 8], 5, 2)
 
 ## create a ellipsoid with center at [0, 10, 0] and the semi-axes [3, 4, 5] (color index = 3)
-e1 = create_ellip([0, 10, 0], [3, 4, 5], 3)
+e1 = create_ellipsoid([0, 10, 0], [3, 4, 5], 3)
 
 ## wait 5 secs
 for i in 1:5
@@ -36,4 +36,4 @@ end
 clear_geom(c1)
 
 # export grid array with geometry indexes
-grid = export_grid();
+grid = export_grid()

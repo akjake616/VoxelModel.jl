@@ -13,6 +13,65 @@ function reset_voxel()
 end
 
 """
+    export_voxel()
+
+    Exports the current voxel voxel as a `Voxels` struct.
+    
+    # Returns
+    - `Voxels`: The current voxel voxel.
+"""
+function export_voxel()
+    return voxel
+end
+
+"""
+    save_voxel(fileName::String)
+
+    save voxel in JLD format. 
+    
+    # Arguments
+    - `fileName::String`: file name of the JLD file
+"""
+function save_voxel(fileName::String)
+    save(fileName, "voxel", voxel)
+    return nothing
+end
+
+"""
+    load_voxel(fileName::String)
+
+    load voxel in JLD format. This will reset the current voxel space.
+    
+    # Arguments
+    - `fileName::String`: file name of the JLD file
+"""
+function load_voxel(fileName::String)
+    global voxel = load(fileName, "voxel")
+    empty!(idDict)
+    idCount[] = 0
+    grid_ind = sort(unique(voxel.grid))
+    filter!(x -> x != 0, grid_ind)
+    
+    for ind in grid_ind
+        idCount[] += 1
+        idDict[idCount[]] = ind
+    end
+    nx = size(voxel.grid, 1)
+    ny = size(voxel.grid, 2)
+    nz = size(voxel.grid, 3)
+    global gridID = Array{Vector}(undef, nx, ny, nz)
+    for i in 1:nx, j in 1:ny, k in 1:nz
+        gridID[i, j, k] = []
+        if voxel.grid[i, j, k] != 0
+            ind = findfirst(x -> x .== voxel.grid[i, j, k], collect(values(idDict)))
+            push!(gridID[i, j, k], collect(keys(idDict))[ind])
+        end
+    end
+    
+    return nothing
+end
+
+"""
     reset_ref(b::Bool)
 
     Toggles the display of the reference axes at the origin. The default state is `true` (axes visible).
@@ -80,7 +139,6 @@ function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, 
     sz = Int(_round((dim[3]-2*dz/fac) / (dz/fac))) + 1
 
     pos = []
-
     if mode == "center"
         xs = origin[1] - dim[1]/2 + dx / fac
         ys = origin[2] - dim[2]/2 + dy / fac
@@ -149,7 +207,7 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
 end
 
 """
-    create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+    create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
 
     Creates an ellipsoid with the specified parameters.
     
@@ -159,7 +217,7 @@ end
     - `ind::Int=1`: The color index of the ellipsoid.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+function create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
     @assert length(origin) == 3
     @assert length(par) == 3
     @assert fac > 0
@@ -194,7 +252,7 @@ function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, f
 end
 
 """
-    create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+    create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
 
     Creates a cylinder with the specified parameters.
     
@@ -205,7 +263,7 @@ end
     - `ind::Int=1`: The color index of the cylinder.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+function create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
     @assert length(origin) == 3
     @assert fac > 0
 
@@ -365,35 +423,6 @@ function export_grid()
     return grid
 end
 
-"""
-    export_voxel()
 
-    Exports the current voxel voxel as a `Voxels` struct.
-    
-    # Returns
-    - `Voxels`: The current voxel voxel.
-"""
-function export_voxel()
-    return voxel
-end
-
-function save_voxel(fileName::String)
-    save(fileName, "voxel", voxel)
-    return nothing
-end
-
-function load_voxel(fileName::String)
-    global voxel = load(fileName, "voxel")
-    # empty!(idDict)
-    # idCount[] = 0
-    grid_ind = sort(unique(voxel.grid))
-    filter!(x -> x != 0, grid_ind)
-    gridID_new = Array{Vector}(undef, nx, ny, nz)
-    for i in 1:nx, j in 1:ny, k in 1:nz
-        gridID_new[i, j, k] = []
-    end
-    
-    
-end
 #endregion
 
