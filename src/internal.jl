@@ -1,5 +1,5 @@
 ##region internal functionalities
-function _plot_voxel(addRef::Bool=true)
+function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
     if isnothing(canvas)
         global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
         display(canvas)
@@ -10,26 +10,26 @@ function _plot_voxel(addRef::Bool=true)
         add_ref_axes!(canvas, [0, 0, 0], 1)
     end
 
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
-    nx = size(space.gridID, 1)
-    ny = size(space.gridID, 2)
-    nz = size(space.gridID, 3)
+    nx = size(gridID, 1)
+    ny = size(gridID, 2)
+    nz = size(gridID, 3)
 
-    xmin = space.start[1]
-    ymin = space.start[2]
-    zmin = space.start[3]
+    xmin = voxel.start[1]
+    ymin = voxel.start[2]
+    zmin = voxel.start[3]
 
-    id_index = sort(unique(space.gridID))
+    id_index = sort(unique(gridID))
     filter!(x -> x != [], id_index)
 
     for ind in eachindex(id_index)
         if idDict[][id_index[ind][end]] != 0
             ptsArray = []
             for i in 1:nx, j in 1:ny, k in 1:nz
-                if space.gridID[i, j, k] == id_index[ind]
+                if gridID[i, j, k] == id_index[ind]
                     pts1 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
                     pts2 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
                     pts3 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
@@ -39,39 +39,37 @@ function _plot_voxel(addRef::Bool=true)
                     pts7 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
                     pts8 = [(i - 1.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
     
-                    if i == 1 || space.gridID[i-1, j, k] == []
+                    if i == 1 || gridID[i-1, j, k] == [] || idDict[][gridID[i-1, j, k][end]] == 0
                         push!(ptsArray, pts1)
                         push!(ptsArray, pts4)
                         push!(ptsArray, pts8)
                         push!(ptsArray, pts5)
                     end
-                    if i == nx || space.gridID[i+1, j, k] == []
+                    if i == nx || gridID[i+1, j, k] == [] || idDict[][gridID[i+1, j, k][end]] == 0
                         push!(ptsArray, pts2)
                         push!(ptsArray, pts3)
                         push!(ptsArray, pts7)
                         push!(ptsArray, pts6)
                     end
-    
-                    if j == 1 || space.gridID[i, j-1, k] == []
+                    if j == 1 || gridID[i, j-1, k] == [] || idDict[][gridID[i, j-1, k][end]] == 0
                         push!(ptsArray, pts1)
                         push!(ptsArray, pts2)
                         push!(ptsArray, pts6)
                         push!(ptsArray, pts5)
                     end
-                    if j == ny || space.gridID[i, j+1, k] == []
+                    if j == ny || gridID[i, j+1, k] == [] || idDict[][gridID[i, j+1, k][end]] == 0
                         push!(ptsArray, pts4)
                         push!(ptsArray, pts3)
                         push!(ptsArray, pts7)
                         push!(ptsArray, pts8)
                     end
-    
-                    if k == 1 || space.gridID[i, j, k-1] == []
+                    if k == 1 || gridID[i, j, k-1] == [] || idDict[][gridID[i, j, k-1][end]] == 0
                         push!(ptsArray, pts1)
                         push!(ptsArray, pts2)
                         push!(ptsArray, pts3)
                         push!(ptsArray, pts4)
                     end
-                    if k == nz || space.gridID[i, j, k+1] == []
+                    if k == nz || gridID[i, j, k+1] == [] || idDict[][gridID[i, j, k+1][end]] == 0
                         push!(ptsArray, pts5)
                         push!(ptsArray, pts6)
                         push!(ptsArray, pts7)
@@ -88,38 +86,38 @@ function _plot_voxel(addRef::Bool=true)
             voxel_obj = polygons(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
     
             addtraces!(canvas, voxel_obj)
-            sleep(0.1)
+            sleep(0.01)
         end
     end
 end
 
-function _add_geom(geo::Geometry)
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+function _add_geom(geo::Geometry, gridID::Array{Vector})
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
     np = length(geo.pos)
     xrange = getindex.(geo.pos, 1)
     yrange = getindex.(geo.pos, 2)
     zrange = getindex.(geo.pos, 3)
 
-    if isempty(space.gridID)
+    if isempty(gridID)
         ngx = 1
         ngy = 1
         ngz = 1
     else
-        ngx = size(space.gridID, 1)
-        ngy = size(space.gridID, 2)
-        ngz = size(space.gridID, 3)
+        ngx = size(gridID, 1)
+        ngy = size(gridID, 2)
+        ngz = size(gridID, 3)
     end
 
-    xmin = _round((minimum([minimum(xrange), space.start[1]]) - shift[]*dx/2)/dx)*dx + shift[]*dx/2
-    ymin = _round((minimum([minimum(yrange), space.start[2]]) - shift[]*dy/2)/dy)*dy + shift[]*dy/2
-    zmin = _round((minimum([minimum(zrange), space.start[3]]) - shift[]*dz/2)/dz)*dz + shift[]*dz/2
+    xmin = _round((minimum([minimum(xrange), voxel.start[1]]) - shift[]*dx/2)/dx)*dx + shift[]*dx/2
+    ymin = _round((minimum([minimum(yrange), voxel.start[2]]) - shift[]*dy/2)/dy)*dy + shift[]*dy/2
+    zmin = _round((minimum([minimum(zrange), voxel.start[3]]) - shift[]*dz/2)/dz)*dz + shift[]*dz/2
 
-    xmax = _round((maximum([maximum(xrange), space.start[1] + (ngx - 1) * dx]) - shift[]*dx/2)/dx)*dx + shift[]*dx/2
-    ymax = _round((maximum([maximum(yrange), space.start[2] + (ngy - 1) * dy]) - shift[]*dy/2)/dy)*dy + shift[]*dy/2
-    zmax = _round((maximum([maximum(zrange), space.start[3] + (ngz - 1) * dz]) - shift[]*dz/2)/dz)*dz + shift[]*dz/2
+    xmax = _round((maximum([maximum(xrange), voxel.start[1] + (ngx - 1) * dx]) - shift[]*dx/2)/dx)*dx + shift[]*dx/2
+    ymax = _round((maximum([maximum(yrange), voxel.start[2] + (ngy - 1) * dy]) - shift[]*dy/2)/dy)*dy + shift[]*dy/2
+    zmax = _round((maximum([maximum(zrange), voxel.start[3] + (ngz - 1) * dz]) - shift[]*dz/2)/dz)*dz + shift[]*dz/2
 
     x = collect(xmin:dx:xmax)
     y = collect(ymin:dy:ymax)
@@ -134,9 +132,9 @@ function _add_geom(geo::Geometry)
         gridID_new[i, j, k] = []
     end
 
-    if !isempty(space.gridID)
+    if !isempty(gridID)
         for i in 1:ngx, j in 1:ngy, k in 1:ngz
-            gridID_new[findfirst(x .== space.start[1])+(i-1), findfirst(y .== space.start[2])+(j-1), findfirst(z .== space.start[3])+(k-1)] = space.gridID[i, j, k]
+            gridID_new[findfirst(x .== voxel.start[1])+(i-1), findfirst(y .== voxel.start[2])+(j-1), findfirst(z .== voxel.start[3])+(k-1)] = gridID[i, j, k]
         end
     end
 
@@ -151,42 +149,46 @@ function _add_geom(geo::Geometry)
         end
     end
 
-    space.gridID = gridID_new
+    global gridID = gridID_new
 
-    space.start[1] = xmin
-    space.start[2] = ymin
-    space.start[3] = zmin
+    voxel.start[1] = xmin
+    voxel.start[2] = ymin
+    voxel.start[3] = zmin
+    
+    voxel.grid = export_grid()
+    
+    return nothing
 end
 
-function _add_geom(geoList::Vector{Geometry})
+function _add_geom(geoList::Vector{Geometry}, gridID::Array{Vector})
 
     for i in eachindex(geoList)
-        _add_geom(geoList[i])
+        _add_geom(geoList[i], gridID)
     end
 end
 
-function _del_geom(geo::Geometry, trim::Bool=true)
+function _del_geom(geo::Geometry, gridID::Array{Vector}, trim::Bool=true)
 
     np = length(geo.pos)
 
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
-    ngx = size(space.gridID, 1)
-    ngy = size(space.gridID, 2)
-    ngz = size(space.gridID, 3)
+    ngx = size(gridID, 1)
+    ngy = size(gridID, 2)
+    ngz = size(gridID, 3)
 
-    x = collect(space.start[1]:dx:(ngx-1)*dx+space.start[1])
-    y = collect(space.start[2]:dy:(ngy-1)*dy+space.start[2])
-    z = collect(space.start[3]:dz:(ngz-1)*dz+space.start[3])
+    x = collect(voxel.start[1]:dx:(ngx-1)*dx+voxel.start[1])
+    y = collect(voxel.start[2]:dy:(ngy-1)*dy+voxel.start[2])
+    z = collect(voxel.start[3]:dz:(ngz-1)*dz+voxel.start[3])
 
     for n in 1:np
         indx = _find_nearest(x, geo.pos[n][1])
         indy = _find_nearest(y, geo.pos[n][2])
         indz = _find_nearest(z, geo.pos[n][3])
         for i in eachindex(indx), j in eachindex(indy), k in eachindex(indz)
-            filter!(e -> e != geo.ID, space.gridID[indx[i], indy[j], indz[k]])
+            filter!(e -> e != geo.ID, gridID[indx[i], indy[j], indz[k]])
         end
     end
 
@@ -199,52 +201,56 @@ function _del_geom(geo::Geometry, trim::Bool=true)
         z2 = ngz
 
         for i in 1:ngx
-            if unique(space.gridID[i, :, :]) != []
+            if unique(gridID[i, :, :]) != []
                 x1 = i
                 break
             end
         end
         for i in ngx:1
-            if unique(space.gridID[i, :, :]) != []
+            if unique(gridID[i, :, :]) != []
                 x2 = i
                 break
             end
         end
         for i in 1:ngy
-            if unique(space.gridID[:, i, :]) != []
+            if unique(gridID[:, i, :]) != []
                 y1 = i
                 break
             end
         end
         for i in ngy:1
-            if unique(space.gridID[:, i, :]) != []
+            if unique(gridID[:, i, :]) != []
                 y2 = i
                 break
             end
         end
         for i in 1:ngz
-            if unique(space.gridID[:, :, i]) != []
+            if unique(gridID[:, :, i]) != []
                 z1 = i
                 break
             end
         end
         for i in ngz:1
-            if unique(space.gridID[:, :, i]) != []
+            if unique(gridID[:, :, i]) != []
                 z2 = i
                 break
             end
         end
 
-        space.gridID = space.gridID[x1:x2, y1:y2, z1:z2]
-        space.start[1] = space.start[1] + (x1 - 1) * dx
-        space.start[2] = space.start[2] + (y1 - 1) * dy
-        space.start[3] = space.start[3] + (z1 - 1) * dz
+        gridID = gridID[x1:x2, y1:y2, z1:z2]
+        voxel.start[1] = voxel.start[1] + (x1 - 1) * dx
+        voxel.start[2] = voxel.start[2] + (y1 - 1) * dy
+        voxel.start[3] = voxel.start[3] + (z1 - 1) * dz
+        
+        voxel.grid = export_grid()
+        
+        return nothing
     end
 end
 
-function _del_geom(geoList::Vector{Geometry}, trim::Bool=true)
+function _del_geom(geoList::Vector{Geometry}, gridID::Array{Vector}, trim::Bool=true)
     for i in eachindex(geoList)
-        _del_geom(geoList[i], trim)
+        _del_geom(geoList[i], gridID, trim)
     end
 end
 

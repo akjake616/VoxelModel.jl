@@ -2,10 +2,13 @@
 """
     reset_voxel()
 
-    Reset the full voxel space. 
+    Reset the full voxel voxel. 
 """
 function reset_voxel()
-    global space = Voxels()
+    global voxel = Voxels()
+    global gridID = []
+    idCount[] = 0
+    return nothing
 end
 
 """
@@ -31,7 +34,8 @@ end
 """
 function reset_shift(b::Bool)
     shift[] = b
-    global space = Voxels()
+    global voxel = Voxels()
+    return nothing
 end
 
 """
@@ -45,7 +49,8 @@ end
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
     start = [shift[] * 1 / 2 * dl[1], shift[] * 1 / 2 * dl[2], shift[] * 1 / 2 * dl[3]]
-    global space = Voxels([], dl, start)
+    global voxel = Voxels([], dl, start)
+    return nothing
 end
 
 """
@@ -65,9 +70,9 @@ function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, 
     @assert length(dim) == 3
     @assert fac > 0
 
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
     sx = Int(_round((dim[1]-2*dx/fac) / (dx/fac))) + 1
     sy = Int(_round((dim[2]-2*dy/fac) / (dy/fac))) + 1
@@ -92,9 +97,9 @@ function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, 
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
     idDict[][idCount[]] = ind
-    _add_geom(geo)
+    _add_geom(geo, gridID)
 
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 
     return geo
 end
@@ -114,9 +119,9 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
     @assert length(origin) == 3
     @assert fac > 0
 
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
     sr = maximum([ceil(Int, radius / (dx/fac)), ceil(Int, radius / (dy/fac)), ceil(Int, radius / (dz/fac))])
 
@@ -135,9 +140,9 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
     idDict[][idCount[]] = ind
-    _add_geom(geo)
+    _add_geom(geo, gridID)
 
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 
     return geo
 end
@@ -158,9 +163,9 @@ function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, f
     @assert length(par) == 3
     @assert fac > 0
 
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
     sa = ceil(Int, par[1] / (dx/fac))
     sb = ceil(Int, par[2] / (dy/fac))
@@ -180,9 +185,9 @@ function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, f
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
     idDict[][idCount[]] = ind
-    _add_geom(geo)
+    _add_geom(geo, gridID)
 
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 
     return geo
 end
@@ -203,9 +208,9 @@ function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::I
     @assert length(origin) == 3
     @assert fac > 0
 
-    dx = space.dl[1]
-    dy = space.dl[2]
-    dz = space.dl[3]
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
 
     sr = maximum([ceil(Int, radius / (dx/fac)), ceil(Int, radius / (dy/fac))])
     sz = Int(_round((height-2*dz/fac) / (dz/fac))) + 1
@@ -224,9 +229,9 @@ function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::I
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
     idDict[][idCount[]] = ind
-    _add_geom(geo)
+    _add_geom(geo, gridID)
 
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 
     return geo
 end
@@ -243,7 +248,7 @@ end
 function trans!(geo::Geometry, dl::Vector{<:Real})
     @assert length(dl) == 3
 
-    _del_geom(geo)
+    _del_geom(geo, gridID)
 
     for n in eachindex(geo.pos)
         geo.pos[n][1] += dl[1]
@@ -251,9 +256,9 @@ function trans!(geo::Geometry, dl::Vector{<:Real})
         geo.pos[n][1] += dl[3]
     end
 
-    _add_geom(geo)
+    _add_geom(geo, gridID)
 
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 end
 
 """
@@ -270,7 +275,7 @@ end
 function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
     @assert length(axis) == 3
 
-    _del_geom(geo)
+    _del_geom(geo, gridID)
 
     axis = axis ./ norm(axis)
     vrot = similar(geo.pos)
@@ -287,30 +292,30 @@ function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:R
         geo.pos[n] = vrot[n] .+ origin
     end
 
-    _add_geom(geo)
+    _add_geom(geo, gridID)
 
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 end
 
 """
     clear_geom(geo::Geometry)
 
-    Removes the specified geometry from the voxel space.
+    Removes the specified geometry from the voxel voxel.
     
     # Arguments
     - `geo::Geometry`: The geometry to be removed.
 """
 function clear_geom(geo::Geometry)
 
-    _del_geom(geo)
+    _del_geom(geo, gridID)
     geo = nothing
-    _plot_voxel(refAxis[])
+    _plot_voxel(gridID, refAxis[])
 end
 
 """
     clear_geom(geoList::Vector{Geometry})
 
-    Removes the specified list of geometries from the voxel space.
+    Removes the specified list of geometries from the voxel voxel.
     
     # Arguments
     - `geoList::Vector{Geometry}`: The list of geometries to be removed.
@@ -318,7 +323,7 @@ end
 function clear_geom(geoList::Vector{Geometry})
 
     for i in eachindex(geoList)
-        _del_geom(geoList[i])
+        _del_geom(geoList[i], gridID)
         geoList[i] = nothing
     end
 end
@@ -326,7 +331,7 @@ end
 """
     plot_voxel(addRef::Bool=true)
 
-    Plots the voxel space. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
+    Plots the voxel voxel. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
     
     # Arguments
     - `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
@@ -336,19 +341,19 @@ function plot_voxel(addRef::Bool=true)
     global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
     display(canvas)
     
-    _plot_voxel(addRef)
+    _plot_voxel(gridID, addRef)
 end
 
 """
     export_voxel()
 
-    Exports the current voxel space as a `Voxels` struct.
+    Exports the current voxel voxel as a `Voxels` struct.
     
     # Returns
-    - `Voxels`: The current voxel space.
+    - `Voxels`: The current voxel voxel.
 """
 function export_voxel()
-    return space
+    return voxel
 end
 
 """
@@ -360,14 +365,24 @@ end
     - `Array{Int}`: The grid array with color indexes.
 """
 function export_grid()
-    grid = zeros(Int, size(space.gridID))
+    grid = zeros(Int, size(gridID))
     for i in eachindex(grid)
-        if space.gridID[i] == []
+        if gridID[i] == []
             grid[i] = 0
         else
-            grid[i] = idDict[][space.gridID[i][end]]
+            grid[i] = idDict[][gridID[i][end]]
         end
     end
+    return grid
+end
+
+function save_grid(fileName::String)
+    grid = export_grid()
+    save(fileName, "grid", grid)
+end
+
+function read_grid(fileName::String)
+    grid = load(fileName, "grid")
     return grid
 end
 #endregion

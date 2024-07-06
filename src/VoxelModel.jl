@@ -6,10 +6,14 @@ export trans!, rot!
 export clear_geom, plot_voxel, export_voxel, export_grid
 export colorDict, canvas
 
+export gridID, idDict
+
 using PlotlyJS
 using PlotlyGeometries
 using LinearAlgebra
 using Combinatorics
+
+using Infiltrator
 
 #region structs
 mutable struct Geometry
@@ -19,7 +23,7 @@ mutable struct Geometry
 end
 
 Base.@kwdef mutable struct Voxels
-    gridID::Array{Vector} = []
+    grid::Array{Int, 3} = zeros(1, 1, 1)
     dl::Vector{Float64} = [1.0, 1.0, 1.0]
     start::Vector{Float64} = [shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]
 end
@@ -31,7 +35,8 @@ const refAxis = Ref(true)
 const idCount = Ref{Int}(0)
 const idDict = Ref(Dict{Int, Int}())
 
-global space = Voxels()
+global voxel = Voxels()
+global gridID::Array{Vector} = []
 global canvas = nothing
 const colorDict = Dict{Int, String}()
 #endregion
