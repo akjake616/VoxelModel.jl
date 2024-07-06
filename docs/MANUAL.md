@@ -18,9 +18,9 @@ The `index` value is analogous to material index in FDTD/PSTD simulations. In `V
 colorDict[4] = "pink"
  ```
 
-sets the grids with value `4` as pink voxels. If the key is not found, a random color is assigned. It is noted that key `0` is used for geometry deletion, please refer to  `ex_advanced.jl` in the examples folder.
+sets the grids with index value `4` as pink voxels. If the key is not found, a random color is assigned. It is noted that key `0` is used for geometry deletion (please refer to  `ex_advanced.jl` in the examples folder).
 
-Normally one does not need to deal with the `Geometry` struct directly. To add geometries, use API functions which starts with `craete_`. `trans!` and `rot!` are used for translations and rotations of the created geometry.
+Normally one does not need to deal with the `Geometry` struct directly. To add geometries, use API functions which starts with `craete_` to build geometries. `trans!` and `rot!` are used for translations and rotations of the created geometry.
 
 The `Voxels` struct represents the voxel space as a result of the prsented geometries. The struct is composed of `grid`, which stores the grid array with the integer index of the geometries (last added), with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
 
@@ -32,13 +32,11 @@ Base.@kwdef mutable struct Voxels
 end
  ```
 
-
-
 If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exported as `canvas` which can be used for further modifications. 
 
 ## API
 
-### reset_voxel
+### reset voxel space
 
 ```julia
 reset_voxel()
@@ -51,7 +49,7 @@ Reset the full voxel space.
 
 ___
 
-### export_voxel
+### export voxel
 
 ```julia
 export_voxel()
@@ -66,7 +64,7 @@ Exports the current voxel as a `Voxels` struct.
 ___
 
 
-### save_voxel
+### save voxel
 
 ```julia
 save_voxel(fileName::String)
@@ -78,7 +76,7 @@ save voxel in JLD format.
 
 ___
 
-### load_voxel
+### load voxel
 
 ```julia
 load_voxel(fileName::String)
@@ -92,7 +90,7 @@ load voxel in JLD format. This will reset the current voxel space.
 
 ___
 
-### plot_voxel
+### plot voxel
 
 ```julia
 plot_voxel(addRef::Bool=true)
@@ -105,7 +103,7 @@ Plots the voxel space. If `addRef=false`, the reference axes will not be added. 
 
 ___
 
-### reset_ref
+### reset referecnce axes
 
 ```julia
 reset_ref(b::Bool)
@@ -118,7 +116,7 @@ Toggles the display of the reference axes at the origin. The default state is `t
 
 ___
 
-### reset_shift
+### reset shift 
 
 ```julia
 reset_shift(b::Bool)
@@ -157,6 +155,23 @@ Creates a cuboid with the specified parameters.
 - `dim::Vector{<:Real}`: The dimensions of the cuboid.
 - `ind::Int=1`: The color index of the cuboid.
 - `mode::String="corner"`: The mode specifying the cuboid's origin ("corner" or "center").
+- `fac::Real=2`: The interior densified factor according to the grid spacing.
+
+___
+
+### create_cube
+
+```julia
+creat_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2)
+```
+
+Creates a cube with the specified parameters.
+
+#### Arguments
+- `origin::Vector{<:Real}`: The origin point of the cube.
+- `dim::Real`: The side length of the cube.
+- `ind::Int=1`: The color index of the cube.
+- `mode::String="corner"`: The mode specifying the cube's origin ("corner" or "center").
 - `fac::Real=2`: The interior densified factor according to the grid spacing.
 
 ___
