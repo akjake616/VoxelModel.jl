@@ -2,7 +2,7 @@
 
 ## Overview
 
-The source folder is composed the main module `VoxelModel.jl`, the definition of color index file `color_dict.jl` and other supplementary files. In the modeule, the `Geometry` struct represents a geometric shape with a list of positions `pos`, a color index `index` and a unique `ID`:
+The `Geometry` struct represents a geometric shape with a list of positions `pos`, an integer index `index` and a unique `ID`:
 
 ```julia
 mutable struct Geometry
@@ -12,7 +12,17 @@ mutable struct Geometry
 end
 ```
 
- The `Voxels` struct represents the voxel space. The struct is composed of `grid`, which stores the grid array with the integer index as its element, with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
+The `index` value is analogous to material index in FDTD/PSTD simulations. In `VoxelModel.jl`, they are used to set the colors of the geometries. In order to set the color, one can edit the dict `colorDict`, for example:
+
+```julia
+colorDict[4] = "pink"
+ ```
+
+sets the grids with value `4` as pink voxels. If the key is not found, a random color is assigned. It is noted that key `0` is used for geometry deletion, please refer to  `ex_advanced.jl` in the examples folder.
+
+Normally one does not need to deal with the `Geometry` struct directly. To add geometries, use API functions which starts with `craete_`. `trans!` and `rot!` are used for translations and rotations of the created geometry.
+
+The `Voxels` struct represents the voxel space as a result of the prsented geometries. The struct is composed of `grid`, which stores the grid array with the integer index of the geometries (last added), with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
 
  ```julia
 Base.@kwdef mutable struct Voxels
@@ -22,13 +32,7 @@ Base.@kwdef mutable struct Voxels
 end
  ```
 
-The indexes in `grid` are analogous to material indexes in FDTD/PSTD simulations. They are used to set the colors of the geometries. In order to set the color of the geometry, one can edit the dict `colorDict`, for example:
 
-```julia
-colorDict[4] = "pink"
- ```
-
-sets the `grid` with value `4` as pink voxel. If the key is not found, a random color is assigned. 
 
 If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exported as `canvas` which can be used for further modifications. 
 
@@ -44,6 +48,60 @@ Reset the full voxel space.
 
 #### Arguments
 - None
+
+___
+
+### export_voxel
+
+```julia
+export_voxel()
+```
+
+Exports the current voxel as a `Voxels` struct.
+
+
+#### Returns
+- `voxel::Voxels`: The current voxel space.
+
+___
+
+
+### save_voxel
+
+```julia
+save_voxel(fileName::String)
+```
+save voxel in JLD format. 
+
+#### Arguments
+- `fileName::String`: file name of the JLD file
+
+___
+
+### load_voxel
+
+```julia
+load_voxel(fileName::String)
+```
+
+load voxel in JLD format. This will reset the current voxel space.
+
+
+#### Arguments
+- `fileName::String`: file name of the JLD file
+
+___
+
+### plot_voxel
+
+```julia
+plot_voxel(addRef::Bool=true)
+```
+
+Plots the voxel space. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
+
+#### Arguments
+- `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
 
 ___
 
@@ -66,10 +124,10 @@ ___
 reset_shift(b::Bool)
 ```
 
-Sets the `shift_half[]` parameter to the specified boolean value `b`. `shift_half[]` means whether to shift the center with half grid spacing. For example, if the spacing is `1`, the grid center will be at `-0.5, 0.5, 1.5, ...`. The default of `shift_half[]` is `true`. 
+Sets the `shift[]` parameter to the specified boolean value `b`. `shift[]` means whether to shift the center with half grid spacing. For example, if the spacing is `1`, the grid center will be at `-0.5, 0.5, 1.5, ...`. The default of `shift[]` is `true`. 
 
 #### Arguments
-- `b::Bool`: Boolean value to set the `shift_half[]` parameter.
+- `b::Bool`: Boolean value to set the `shift[]` parameter.
 
 ___
 
@@ -119,10 +177,10 @@ Creates a sphere with the specified parameters.
 
 ___
 
-### create_ellip
+### create_ellipsoid
 
 ```julia
-create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
 ```
 
 Creates an ellipsoid with the specified parameters.
@@ -135,10 +193,10 @@ Creates an ellipsoid with the specified parameters.
 
 ___
 
-### create_cylin
+### create_cylinder
 
 ```julia
-create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
 ```
 
 Creates a cylinder with the specified parameters.
@@ -208,31 +266,6 @@ Removes the specified list of geometries from the voxel space.
 
 ___
 
-### plot_voxel
-
-```julia
-plot_voxel(addRef::Bool=true)
-```
-
-Plots the voxel space. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
-
-#### Arguments
-- `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
-
-___
-
-### export_voxel
-
-```julia
-export_voxel()
-```
-
-Exports the current voxel space as a `Voxels` struct.
-
-#### Returns
-- `Voxels`: The current voxel space.
-
-___
 
 ### export_grid
 

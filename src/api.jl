@@ -15,10 +15,10 @@ end
 """
     export_voxel()
 
-    Exports the current voxel voxel as a `Voxels` struct.
+    Exports the current voxel as a `Voxels` struct.
     
     # Returns
-    - `Voxels`: The current voxel voxel.
+    - `voxel::Voxels`: The current voxel space.
 """
 function export_voxel()
     return voxel
@@ -70,6 +70,24 @@ function load_voxel(fileName::String)
     
     return nothing
 end
+
+
+"""
+    plot_voxel(addRef::Bool=true)
+
+    Plots the voxel voxel. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
+    
+    # Arguments
+    - `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
+"""
+function plot_voxel(addRef::Bool=true)
+    
+    global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
+    display(canvas)
+    
+    _plot_voxel(gridID, addRef)
+end
+
 
 """
     reset_ref(b::Bool)
@@ -385,22 +403,6 @@ function clear_geom(geoList::Vector{Geometry})
         _del_geom(geoList[i], gridID)
         geoList[i] = nothing
     end
-end
-
-"""
-    plot_voxel(addRef::Bool=true)
-
-    Plots the voxel voxel. If `addRef=false`, the reference axes will not be added. Call this function if the plot window is accidentally closed.
-    
-    # Arguments
-    - `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
-"""
-function plot_voxel(addRef::Bool=true)
-    
-    global canvas = plot([mesh3d(x=0, y=0, z=0)], blank_layout())
-    display(canvas)
-    
-    _plot_voxel(gridID, addRef)
 end
 
 """
