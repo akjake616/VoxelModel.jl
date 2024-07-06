@@ -22,14 +22,16 @@ function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
     ymin = voxel.start[2]
     zmin = voxel.start[3]
 
-    id_index = sort(unique(gridID))
-    filter!(x -> x != [], id_index)
+    id_list = sort(unique(gridID))
+    filter!(x -> x != [], id_list)
 
-    for ind in eachindex(id_index)
-        if idDict[][id_index[ind][end]] != 0
+    @all pts1 pts2 pts3 pts4 pts5 pts6 pts7 pts8 = fill(0.0, 3)
+    @all r g b = 0.0
+    for ind in eachindex(id_list)
+        if idDict[id_list[ind][end]] != 0
             ptsArray = []
             for i in 1:nx, j in 1:ny, k in 1:nz
-                if gridID[i, j, k] == id_index[ind]
+                if gridID[i, j, k] == id_list[ind]
                     pts1 = [(i - 1.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
                     pts2 = [(i - 0.5) * dx + xmin, (j - 1.5) * dy + ymin, (k - 1.5) * dz + zmin]
                     pts3 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 1.5) * dz + zmin]
@@ -39,37 +41,37 @@ function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
                     pts7 = [(i - 0.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
                     pts8 = [(i - 1.5) * dx + xmin, (j - 0.5) * dy + ymin, (k - 0.5) * dz + zmin]
     
-                    if i == 1 || gridID[i-1, j, k] == [] || idDict[][gridID[i-1, j, k][end]] == 0
+                    if i == 1 || gridID[i-1, j, k] == [] || idDict[gridID[i-1, j, k][end]] == 0
                         push!(ptsArray, pts1)
                         push!(ptsArray, pts4)
                         push!(ptsArray, pts8)
                         push!(ptsArray, pts5)
                     end
-                    if i == nx || gridID[i+1, j, k] == [] || idDict[][gridID[i+1, j, k][end]] == 0
+                    if i == nx || gridID[i+1, j, k] == [] || idDict[gridID[i+1, j, k][end]] == 0
                         push!(ptsArray, pts2)
                         push!(ptsArray, pts3)
                         push!(ptsArray, pts7)
                         push!(ptsArray, pts6)
                     end
-                    if j == 1 || gridID[i, j-1, k] == [] || idDict[][gridID[i, j-1, k][end]] == 0
+                    if j == 1 || gridID[i, j-1, k] == [] || idDict[gridID[i, j-1, k][end]] == 0
                         push!(ptsArray, pts1)
                         push!(ptsArray, pts2)
                         push!(ptsArray, pts6)
                         push!(ptsArray, pts5)
                     end
-                    if j == ny || gridID[i, j+1, k] == [] || idDict[][gridID[i, j+1, k][end]] == 0
+                    if j == ny || gridID[i, j+1, k] == [] || idDict[gridID[i, j+1, k][end]] == 0
                         push!(ptsArray, pts4)
                         push!(ptsArray, pts3)
                         push!(ptsArray, pts7)
                         push!(ptsArray, pts8)
                     end
-                    if k == 1 || gridID[i, j, k-1] == [] || idDict[][gridID[i, j, k-1][end]] == 0
+                    if k == 1 || gridID[i, j, k-1] == [] || idDict[gridID[i, j, k-1][end]] == 0
                         push!(ptsArray, pts1)
                         push!(ptsArray, pts2)
                         push!(ptsArray, pts3)
                         push!(ptsArray, pts4)
                     end
-                    if k == nz || gridID[i, j, k+1] == [] || idDict[][gridID[i, j, k+1][end]] == 0
+                    if k == nz || gridID[i, j, k+1] == [] || idDict[gridID[i, j, k+1][end]] == 0
                         push!(ptsArray, pts5)
                         push!(ptsArray, pts6)
                         push!(ptsArray, pts7)
@@ -77,13 +79,11 @@ function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
                     end
                 end
             end
-            if !haskey(colorDict, idDict[][id_index[ind][end]])
-                r = round(Int, rand() * 255)
-                g = round(Int, rand() * 255)
-                b = round(Int, rand() * 255)
-                colorDict[idDict[][id_index[ind][end]]] = "rgb($r, $g, $b)"
+            if !haskey(colorDict, idDict[id_list[ind][end]])
+                @all r g b = round(Int, rand() * 255)
+                colorDict[idDict[id_list[ind][end]]] = "rgb($r, $g, $b)"
             end
-            voxel_obj = polygons(ptsArray, 4, colorDict[idDict[][id_index[ind][end]]])
+            voxel_obj = polygons(ptsArray, 4, colorDict[idDict[id_list[ind][end]]])
     
             addtraces!(canvas, voxel_obj)
             sleep(0.01)
@@ -102,9 +102,7 @@ function _add_geom(geo::Geometry, gridID::Array{Vector})
     zrange = getindex.(geo.pos, 3)
 
     if isempty(gridID)
-        ngx = 1
-        ngy = 1
-        ngz = 1
+        @all ngx ngy ngz = 1
     else
         ngx = size(gridID, 1)
         ngy = size(gridID, 2)
@@ -161,14 +159,12 @@ function _add_geom(geo::Geometry, gridID::Array{Vector})
 end
 
 function _add_geom(geoList::Vector{Geometry}, gridID::Array{Vector})
-
     for i in eachindex(geoList)
         _add_geom(geoList[i], gridID)
     end
 end
 
 function _del_geom(geo::Geometry, gridID::Array{Vector}, trim::Bool=true)
-
     np = length(geo.pos)
 
     dx = voxel.dl[1]

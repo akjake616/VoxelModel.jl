@@ -8,6 +8,7 @@ function reset_voxel()
     global voxel = Voxels()
     global gridID = []
     idCount[] = 0
+    empty!(idDict)
     return nothing
 end
 
@@ -49,7 +50,7 @@ end
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
     start = [shift[] * 1 / 2 * dl[1], shift[] * 1 / 2 * dl[2], shift[] * 1 / 2 * dl[3]]
-    global voxel = Voxels([], dl, start)
+    global voxel = Voxels(zeros(1, 1, 1), dl, start)
     return nothing
 end
 
@@ -96,7 +97,7 @@ function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, 
 
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
-    idDict[][idCount[]] = ind
+    idDict[idCount[]] = ind
     _add_geom(geo, gridID)
 
     _plot_voxel(gridID, refAxis[])
@@ -139,7 +140,7 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
 
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
-    idDict[][idCount[]] = ind
+    idDict[idCount[]] = ind
     _add_geom(geo, gridID)
 
     _plot_voxel(gridID, refAxis[])
@@ -184,7 +185,7 @@ function create_ellip(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, f
 
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
-    idDict[][idCount[]] = ind
+    idDict[idCount[]] = ind
     _add_geom(geo, gridID)
 
     _plot_voxel(gridID, refAxis[])
@@ -228,7 +229,7 @@ function create_cylin(origin::Vector{<:Real}, radius::Real, height::Real, ind::I
 
     idCount[] += 1
     geo = Geometry(pos, ind, idCount[])
-    idDict[][idCount[]] = ind
+    idDict[idCount[]] = ind
     _add_geom(geo, gridID)
 
     _plot_voxel(gridID, refAxis[])
@@ -345,18 +346,6 @@ function plot_voxel(addRef::Bool=true)
 end
 
 """
-    export_voxel()
-
-    Exports the current voxel voxel as a `Voxels` struct.
-    
-    # Returns
-    - `Voxels`: The current voxel voxel.
-"""
-function export_voxel()
-    return voxel
-end
-
-"""
     export_grid()
 
     Exports the grid array filled with color indexes. Note that when geometries overlap, the index of the last-added geometry is used.
@@ -370,20 +359,41 @@ function export_grid()
         if gridID[i] == []
             grid[i] = 0
         else
-            grid[i] = idDict[][gridID[i][end]]
+            grid[i] = idDict[gridID[i][end]]
         end
     end
     return grid
 end
 
-function save_grid(fileName::String)
-    grid = export_grid()
-    save(fileName, "grid", grid)
+"""
+    export_voxel()
+
+    Exports the current voxel voxel as a `Voxels` struct.
+    
+    # Returns
+    - `Voxels`: The current voxel voxel.
+"""
+function export_voxel()
+    return voxel
 end
 
-function read_grid(fileName::String)
-    grid = load(fileName, "grid")
-    return grid
+function save_voxel(fileName::String)
+    save(fileName, "voxel", voxel)
+    return nothing
+end
+
+function load_voxel(fileName::String)
+    global voxel = load(fileName, "voxel")
+    # empty!(idDict)
+    # idCount[] = 0
+    grid_ind = sort(unique(voxel.grid))
+    filter!(x -> x != 0, grid_ind)
+    gridID_new = Array{Vector}(undef, nx, ny, nz)
+    for i in 1:nx, j in 1:ny, k in 1:nz
+        gridID_new[i, j, k] = []
+    end
+    
+    
 end
 #endregion
 

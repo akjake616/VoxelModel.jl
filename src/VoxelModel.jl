@@ -3,7 +3,7 @@ module VoxelModel
 export reset_voxel, reset_shift, reset_dl
 export create_cuboid, create_sphere, create_ellip, create_cylin
 export trans!, rot!
-export clear_geom, plot_voxel, export_voxel, export_grid
+export clear_geom, plot_voxel, export_voxel, save_voxel, read_voxel
 export colorDict, canvas
 
 export gridID, idDict
@@ -12,6 +12,7 @@ using PlotlyJS
 using PlotlyGeometries
 using LinearAlgebra
 using Combinatorics
+using BatchAssign
 
 using Infiltrator
 
@@ -33,12 +34,12 @@ end
 const shift = Ref(true)
 const refAxis = Ref(true)
 const idCount = Ref{Int}(0)
-const idDict = Ref(Dict{Int, Int}())
+const idDict = Dict{Int, Int}()
+const colorDict = Dict{Int, String}()
 
 global voxel = Voxels()
 global gridID::Array{Vector} = []
 global canvas = nothing
-const colorDict = Dict{Int, String}()
 #endregion
 
 include("api.jl")
