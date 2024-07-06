@@ -16,8 +16,6 @@ using Combinatorics
 using BatchAssign
 using JLD
 
-using Infiltrator
-
 #region structs
 mutable struct Geometry
     pos::Vector{Vector{Float64}}
