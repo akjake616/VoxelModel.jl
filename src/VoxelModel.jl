@@ -2,7 +2,7 @@ module VoxelModel
 
 export reset_voxel, plot_voxel, export_voxel, save_voxel, load_voxel
 export reset_shift, reset_dl
-export create_cuboid, create_sphere, create_ellipsoid, create_cylinder
+export create_cuboid, create_cube, create_sphere, create_ellipsoid, create_cylinder
 export trans!, rot!, export_grid
 export clear_geom
 export colorDict, canvas

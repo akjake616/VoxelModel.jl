@@ -193,7 +193,7 @@ end
     - `mode::String="corner"`: The mode specifying the cube's origin ("corner" or "center").
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function creat_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2)
+function create_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2)
     @assert dim > 0
     return create_cuboid(origin, [dim, dim, dim], ind, mode, fac)
 end
