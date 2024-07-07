@@ -1,6 +1,3 @@
-using Pkg, Revise
-Pkg.activate("..")
-
 using VoxelModel
 
 reset_voxel()
@@ -15,4 +12,4 @@ rot!(c2, 90, [0, 1, 0])
 c3 = create_cylinder([0, 0, -10], 4, 20, 0)
 rot!(c3, 90, [1, 0, 0])
 
-save_voxel("hollowed_sphere_voxel.jld")
+save_voxel("hollowed_sphere.jld")

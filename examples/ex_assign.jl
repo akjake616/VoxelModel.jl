@@ -1,6 +1,3 @@
-using Pkg, Revise
-Pkg.activate("..")
-
 using VoxelModel
 
 A = zeros(Int, 10, 10, 10)

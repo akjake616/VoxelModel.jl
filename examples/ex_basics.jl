@@ -1,9 +1,4 @@
-using Pkg, Revise
-Pkg.activate("..")
-
 using VoxelModel
-using PlotlyJS
-using Infiltrator
 
 reset_voxel()
 
@@ -24,7 +19,6 @@ end
 
 ## translate c1 with [8, 1, 3]
 trans!(c1, [8, 1, 3])
-
 
 ## wait 5 secs
 for i in 1:5

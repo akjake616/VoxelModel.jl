@@ -1,8 +1,4 @@
-using Pkg, Revise
-Pkg.activate("..")
-
 using VoxelModel
-using Infiltrator
 
 reset_voxel()
 
