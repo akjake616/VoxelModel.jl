@@ -26,7 +26,11 @@ Please go to the examples folder for quick understanding of how to use the modul
 
 - `ex_rotation.jl`: See how rotation works.
 
-- `ex_advanced.jl`: Create more complicated geometries. This example demonstrates the creation of a sphere hollowd by cylinders.
+- `ex_advanced.jl`: Create more complicated geometries. This example demonstrates the creation of a sphere hollowd by cylinders. The voxel space is saved as a JLD file.
+
+- `ex_load.jl`: Load voxel space from JLD file and perform further editing.
+
+- `ex_assign.jl`: Assign grid array to the voxel space.
 
 
 ## Usage

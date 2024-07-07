@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `Geometry` struct represents a geometric shape with a list of positions `pos`, an integer index `index` and a unique `ID`:
+It is best for the user to understand the usage by the examples provided in the exa,ples folder. To undersatnd the underlying design, we first introduce the `Geometry` struct. `Geometry` represents a geometric shape with a list of positions `pos`, an integer index `index` and a unique `ID`:
 
 ```julia
 mutable struct Geometry
@@ -11,18 +11,17 @@ mutable struct Geometry
     const ID::Int
 end
 ```
-
-The `index` value is analogous to material index in FDTD/PSTD simulations. In `VoxelModel.jl`, they are used to set the colors of the geometries. In order to set the color, one can edit the dict `colorDict`, for example:
+The positions `pos` are actually a set of equally spaced dense grid points which is used for further voxel approximations. The `index` value is analogous to material index in FDTD/PSTD simulations. In `VoxelModel.jl`, they are used to set the colors of the geometries. In order to set the color, one can edit the dict `colorDict`, for example:
 
 ```julia
 colorDict[4] = "pink"
  ```
 
-sets the grids with index value `4` as pink voxels. If the key is not found, a random color is assigned. It is noted that key `0` is used for geometry deletion (please refer to  `ex_advanced.jl` in the examples folder).
+sets the grids with index value `4` as pink voxels. If the key is not found, a random color is assigned. It is noted that key `0` is used for geometry deletion (please refer to  `ex_advanced.jl` in the examples folder). `ID` is a unique ID number (used for efficient identification of the geometries in the voxel space.
 
 Normally one does not need to deal with the `Geometry` struct directly. To add geometries, use API functions which starts with `craete_` to build geometries. `trans!` and `rot!` are used for translations and rotations of the created geometry.
 
-The `Voxels` struct represents the voxel space as a result of the prsented geometries. The struct is composed of `grid`, which stores the grid array with the integer index of the geometries (last added), with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
+The `Voxels` struct represents the voxel space as a result of the present geometries. The struct is composed of `grid`, which stores the grid array with the integer index of the geometries (only the last added geometry is stored in `grid` if geometry collision occurs), with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
 
  ```julia
 Base.@kwdef mutable struct Voxels
@@ -31,6 +30,14 @@ Base.@kwdef mutable struct Voxels
     start::Vector{Float64} = [shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]
 end
  ```
+
+`shift[]` is a boolean value representing whether to shift the center of each voxel with half grid spacing (one can set the value of `shift[]` using th API function `reset_shift()`). For example, if the spacing is `1`, the voxel center will be at `-0.5, 0.5, 1.5, ...` if `shift[] = true`, and the corner of each voxel will be at  `-1, 0, 1,...` etc. It is noted that when crating a gemetries, one should be cautious about grid shifts. For the default setting (`shift[] = true` and `dl = [1, 1, 1]`), consider the following example:
+
+```julia
+c1 = create_cube([0, 0, 0], 1, "corner") # OK - creates a voxl centered at [0.5, 0.5, 0.5] with side length = 1
+c2 = create_cube([0, 0, 0], 1, "center") # !! - creates a voxl centered at [0.0, 0.0, 0.0] with side length = 2
+```
+`c1` is created as expected, but `c2` is not. This is because, to preserve the center position of the cube (which does not lie on the grid centers), the size is scaled (rounded) to 2 in this case.
 
 If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exported as `canvas` which can be used for further modifications. 
 
@@ -55,11 +62,11 @@ ___
 export_voxel()
 ```
 
-Exports the current voxel as a `Voxels` struct.
+Exports a copy of the current voxel.
 
 
 #### Returns
-- `voxel::Voxels`: The current voxel space.
+- `voxelCopy::Voxels`: The copy of the current voxel space.
 
 ___
 
@@ -72,7 +79,7 @@ save_voxel(fileName::String)
 save voxel in JLD format. 
 
 #### Arguments
-- `fileName::String`: file name of the JLD file
+- `fileName::String`: file name of the JLD file.
 
 ___
 
@@ -86,7 +93,7 @@ load voxel in JLD format. This will reset the current voxel space.
 
 
 #### Arguments
-- `fileName::String`: file name of the JLD file
+- `fileName::String`: file name of the JLD file.
 
 ___
 
@@ -100,6 +107,23 @@ Plots the voxel space. If `addRef=false`, the reference axes will not be added. 
 
 #### Arguments
 - `addRef::Bool=true`: Boolean value to specify whether to add the reference axes to the plot.
+
+___
+
+### assign voxel
+
+```julia
+assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5])
+```
+
+
+Assign grid to voxel space.
+Updates: One can also set `dl` as a real number for equal spacings.
+    
+#### Arguments
+- `grid::Array{Int, 3}`: Interger grid array.
+- `dl::Vector{<:Real}=[1.0, 1.0, 1.0]`: grid spacings.
+- `start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]`: start point.
 
 ___
 
@@ -122,7 +146,7 @@ ___
 reset_shift(b::Bool)
 ```
 
-Sets the `shift[]` parameter to the specified boolean value `b`. `shift[]` means whether to shift the center with half grid spacing. For example, if the spacing is `1`, the grid center will be at `-0.5, 0.5, 1.5, ...`. The default of `shift[]` is `true`. 
+Sets the `shift[]` parameter to the specified boolean value `b`. 
 
 #### Arguments
 - `b::Bool`: Boolean value to set the `shift[]` parameter.
@@ -135,7 +159,8 @@ ___
 reset_dl(dl::Vector{<:Real})
 ```
 
-Updates the grid spacing to the specified vector `dl`.
+Resets the grid spacing to the specified vector `dl`. 
+Updates: One can also set `dl` as a real number for equal spacings.
 
 #### Arguments
 - `dl::Vector{<:Real}`: A vector containing the new grid spacing values.

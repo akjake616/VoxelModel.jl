@@ -15,13 +15,14 @@ end
 """
     export_voxel()
 
-    Exports the current voxel as a `Voxels` struct.
+    Exports a copy of the current voxel.
     
     # Returns
-    - `voxel::Voxels`: The current voxel space.
+    - `voxelCopy::Voxels`: The copy of the current voxel space.
 """
 function export_voxel()
-    return voxel
+    voxelCopy =  Voxels(voxel.grid, voxel.dl, voxel.start)
+    return voxelCopy
 end
 
 """
@@ -47,26 +48,7 @@ end
 """
 function load_voxel(fileName::String)
     global voxel = load(fileName, "voxel")
-    empty!(idDict)
-    idCount[] = 0
-    grid_ind = sort(unique(voxel.grid))
-    filter!(x -> x != 0, grid_ind)
-    
-    for ind in grid_ind
-        idCount[] += 1
-        idDict[idCount[]] = ind
-    end
-    nx = size(voxel.grid, 1)
-    ny = size(voxel.grid, 2)
-    nz = size(voxel.grid, 3)
-    global gridID = Array{Vector}(undef, nx, ny, nz)
-    for i in 1:nx, j in 1:ny, k in 1:nz
-        gridID[i, j, k] = []
-        if voxel.grid[i, j, k] != 0
-            ind = findfirst(x -> x .== voxel.grid[i, j, k], collect(values(idDict)))
-            push!(gridID[i, j, k], collect(keys(idDict))[ind])
-        end
-    end
+    _reset_gridID()
     
     return nothing
 end
@@ -88,6 +70,27 @@ function plot_voxel(addRef::Bool=true)
     _plot_voxel(gridID, addRef)
 end
 
+"""
+assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5])
+
+    Assign grid to voxel space.
+    
+    # Arguments
+    - `grid::Array{Int, 3}`: Interger grid array.
+    - `dl::Vector{<:Real}=[1.0, 1.0, 1.0]`: grid spacings.
+    - `start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]`: start point.
+"""
+function assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5])
+    global voxel.grid = grid
+    reset_dl(dl)
+    reset_start(start)
+    _reset_gridID()
+    return nothing
+end
+function assign_voxel(grid::Array{Int, 3}, dl::Real, start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5])
+    assign_voxel(grid, [dl, dl, dl], start)
+    return nothing
+end
 
 """
     reset_ref(b::Bool)
@@ -112,7 +115,7 @@ end
 """
 function reset_shift(b::Bool)
     shift[] = b
-    global voxel = Voxels()
+    # global voxel = Voxels()
     return nothing
 end
 
@@ -126,8 +129,35 @@ end
 """
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
-    start = [shift[] * 1 / 2 * dl[1], shift[] * 1 / 2 * dl[2], shift[] * 1 / 2 * dl[3]]
-    global voxel = Voxels(zeros(1, 1, 1), dl, start)
+    @assert all(>(0), dl)
+    voxel.dl = dl
+    reset_start(voxel.start)
+    return nothing
+end
+function reset_dl(dl::Real)
+    reset_dl([dl, dl, dl])
+    return nothing
+end
+
+"""
+    reset_start(start::Vector{<:Real})
+
+    reset the start point of the voxel space. Note that th spart point is rounded to the neasrest grid center.
+    
+    # Arguments
+    - `start::Vector{<:Real}`: A vector indicating the spart point.
+"""
+function reset_start(start::Vector{<:Real})
+    @assert length(start) == 3
+    dx = voxel.dl[1]
+    dy = voxel.dl[2]
+    dz = voxel.dl[3]
+    
+    xmin = _round((start[1] - shift[]*dx/2)/dx)*dx + shift[]*dx/2
+    ymin = _round((start[2] - shift[]*dy/2)/dy)*dy + shift[]*dy/2
+    zmin = _round((start[3] - shift[]*dz/2)/dz)*dz + shift[]*dz/2
+    voxel.start = [xmin, ymin, zmin]
+    # global voxel = Voxels(zeros(1, 1, 1), dl, start)
     return nothing
 end
 
@@ -400,7 +430,6 @@ end
     - `geo::Geometry`: The geometry to be removed.
 """
 function clear_geom(geo::Geometry)
-
     _del_geom(geo, gridID)
     geo = nothing
     _plot_voxel(gridID, refAxis[])

@@ -250,6 +250,28 @@ function _del_geom(geoList::Vector{Geometry}, gridID::Array{Vector}, trim::Bool=
     end
 end
 
+function _reset_gridID()
+    empty!(idDict)
+    idCount[] = 0
+    grid_ind = sort(unique(voxel.grid))
+    filter!(x -> x != 0, grid_ind)
+    
+    for ind in grid_ind
+        idCount[] += 1
+        idDict[idCount[]] = ind
+    end
+    nx = size(voxel.grid, 1)
+    ny = size(voxel.grid, 2)
+    nz = size(voxel.grid, 3)
+    global gridID = Array{Vector}(undef, nx, ny, nz)
+    for i in 1:nx, j in 1:ny, k in 1:nz
+        gridID[i, j, k] = []
+        if voxel.grid[i, j, k] != 0
+            ind = findfirst(x -> x .== voxel.grid[i, j, k], collect(values(idDict)))
+            push!(gridID[i, j, k], collect(keys(idDict))[ind])
+        end
+    end
+end
 function _find_nearest(ary::Array{<:Number}, ele::Number)
     tmp = abs.(ary .- ele)
     val, ind = findmin(tmp)
