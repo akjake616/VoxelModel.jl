@@ -1,7 +1,7 @@
 module VoxelModel
 
 export reset_voxel, plot_voxel, export_voxel, save_voxel, load_voxel, assign_voxel
-export reset_shift, reset_dl, reset_start
+export reset_shift, reset_dl, reset_start, reset_ref
 export create_cuboid, create_cube, create_sphere, create_ellipsoid, create_cylinder
 export trans!, rot!, export_grid
 export clear_geom
@@ -31,6 +31,7 @@ end
 #region constrols
 const shift = Ref(true)
 const refAxis = Ref(true)
+const refLen = Ref{Float64}(1)
 const idCount = Ref{Int}(0)
 const idDict = Dict{Int, Int}()
 const colorDict = Dict{Int, String}()

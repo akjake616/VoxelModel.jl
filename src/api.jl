@@ -1,14 +1,17 @@
 #region API
 """
-    reset_voxel()
+    reset_voxel(;render=false)
 
     Reset the full voxel voxel. 
 """
-function reset_voxel()
+function reset_voxel(;render=false)
     global voxel = Voxels()
     global gridID = []
     idCount[] = 0
     empty!(idDict)
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
     return nothing
 end
 
@@ -93,29 +96,33 @@ function assign_voxel(grid::Array{Int, 3}, dl::Real, start::Vector{<:Real}=[shif
 end
 
 """
-    reset_ref(b::Bool)
+    reset_ref(b::Bool, len::Float64=refLen[])
 
     Toggles the display of the reference axes at the origin. The default state is `true` (axes visible).
     
     # Arguments
     - `b::Bool`: Boolean value to set the visibility of the reference axes.
+    - `len::Float64=refLen[]`: reference length of the axes. The default is the minimum of the grid spacings.
 """
-function reset_ref(b::Bool)
+function reset_ref(b::Bool, len::Float64=refLen[])
     refAxis[] = b
-    plot_voxel(refAxis[])
+    refLen[] = len
+    return nothing
 end
 
 """
     reset_shift(b::Bool)
 
-    Sets the `shift[]` parameter to the specified boolean value `b`.
+    Sets the `shift[]` parameter to the specified boolean value `b`. 
+    Since the gird space is shifted, the voxel space will be reseted accordingly. 
+    Use this function before adding geomtries to the voxel space.
     
     # Arguments
     - `b::Bool`: Boolean value to set the `shift[]` parameter.
 """
 function reset_shift(b::Bool)
     shift[] = b
-    # global voxel = Voxels()
+    global voxel = Voxels()
     return nothing
 end
 
@@ -131,7 +138,8 @@ function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
     @assert all(>(0), dl)
     voxel.dl = dl
-    reset_start(voxel.start)
+    reset_start([0, 0, 0])
+    reset_ref(true, minimum(dl))
     return nothing
 end
 function reset_dl(dl::Real)
@@ -157,12 +165,11 @@ function reset_start(start::Vector{<:Real})
     ymin = _round((start[2] - shift[]*dy/2)/dy)*dy + shift[]*dy/2
     zmin = _round((start[3] - shift[]*dz/2)/dz)*dz + shift[]*dz/2
     voxel.start = [xmin, ymin, zmin]
-    # global voxel = Voxels(zeros(1, 1, 1), dl, start)
     return nothing
 end
 
 """
-    create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
+    create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2; render=false)
 
     Creates a cuboid with the specified parameters.
     
@@ -173,7 +180,7 @@ end
     - `mode::String="corner"`: The mode specifying the cuboid's origin ("corner" or "center").
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2)
+function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert length(dim) == 3
     @assert fac > 0
@@ -206,13 +213,14 @@ function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, 
     idDict[idCount[]] = ind
     _add_geom(geo, gridID)
 
-    _plot_voxel(gridID, refAxis[])
-
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
     return geo
 end
 
 """
-    create_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode::String="corner", fac::Real=2)
+    create_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode::String="corner", fac::Real=2; render=false)
 
     Creates a cube with the specified parameters.
     
@@ -223,13 +231,13 @@ end
     - `mode::String="corner"`: The mode specifying the cube's origin ("corner" or "center").
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2)
+function create_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2; render=false)
     @assert dim > 0
-    return create_cuboid(origin, [dim, dim, dim], ind, mode, fac)
+    return create_cuboid(origin, [dim, dim, dim], ind, mode, fac; render=render)
 end
 
 """
-    create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
+    create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2; render=false)
 
     Creates a sphere with the specified parameters.
     
@@ -239,7 +247,7 @@ end
     - `ind::Int=1`: The color index of the sphere.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
+function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert fac > 0
 
@@ -266,13 +274,14 @@ function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Re
     idDict[idCount[]] = ind
     _add_geom(geo, gridID)
 
-    _plot_voxel(gridID, refAxis[])
-
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
     return geo
 end
 
 """
-    create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+    create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2; render=false)
 
     Creates an ellipsoid with the specified parameters.
     
@@ -282,7 +291,7 @@ end
     - `ind::Int=1`: The color index of the ellipsoid.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+function create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert length(par) == 3
     @assert fac > 0
@@ -310,14 +319,14 @@ function create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=
     geo = Geometry(pos, ind, idCount[])
     idDict[idCount[]] = ind
     _add_geom(geo, gridID)
-
-    _plot_voxel(gridID, refAxis[])
-
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
     return geo
 end
 
 """
-    create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+    create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2; render=false)
 
     Creates a cylinder with the specified parameters.
     
@@ -328,7 +337,7 @@ end
     - `ind::Int=1`: The color index of the cylinder.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
 """
-function create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+function create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert fac > 0
 
@@ -340,7 +349,6 @@ function create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind
     sz = Int(_round((height-2*dz/fac) / (dz/fac))) + 1
     pos = []
     for i in -sr:sr, j in -sr:sr, k in 1:sz
-
         x1 = origin[1] + i * (dx/fac) 
         y1 = origin[2] + j * (dy/fac) 
         z1 = origin[3] + k * (dz/fac) 
@@ -354,14 +362,14 @@ function create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind
     geo = Geometry(pos, ind, idCount[])
     idDict[idCount[]] = ind
     _add_geom(geo, gridID)
-
-    _plot_voxel(gridID, refAxis[])
-
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
     return geo
 end
 
 """
-    trans!(geo::Geometry, dl::Vector{<:Real})
+    trans!(geo::Geometry, dl::Vector{<:Real}; render=false)
 
     Translates the geometry by the specified vector `dl`.
     
@@ -369,7 +377,7 @@ end
     - `geo::Geometry`: The geometry to be translated.
     - `dl::Vector{<:Real}`: The translation vector.
 """
-function trans!(geo::Geometry, dl::Vector{<:Real})
+function trans!(geo::Geometry, dl::Vector{<:Real}; render=false)
     @assert length(dl) == 3
 
     _del_geom(geo, gridID)
@@ -382,11 +390,14 @@ function trans!(geo::Geometry, dl::Vector{<:Real})
 
     _add_geom(geo, gridID)
 
-    _plot_voxel(gridID, refAxis[])
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
+    return nothing
 end
 
 """
-    rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
+    rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0]; render=false)
 
     Rotates the geometry by the specified angle `ang` around the axis `axis` and origin `origin`.
     
@@ -396,7 +407,7 @@ end
     - `axis::Vector{<:Real}`: The rotation axis.
     - `origin::Vector{<:Real}=[0]`: The rotation origin. Defaults to the center of the geometry if not specified.
 """
-function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
+function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0]; render=false)
     @assert length(axis) == 3
 
     _del_geom(geo, gridID)
@@ -418,37 +429,43 @@ function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:R
 
     _add_geom(geo, gridID)
 
-    _plot_voxel(gridID, refAxis[])
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
+    return nothing
 end
 
 """
-    clear_geom(geo::Geometry)
+    clear_geom(geo::Geometry; render=false)
 
     Removes the specified geometry from the voxel voxel.
     
     # Arguments
     - `geo::Geometry`: The geometry to be removed.
 """
-function clear_geom(geo::Geometry)
+function clear_geom(geo::Geometry; render=false)
     _del_geom(geo, gridID)
     geo = nothing
-    _plot_voxel(gridID, refAxis[])
+    if render
+        _plot_voxel(gridID, refAxis[])
+    end
+    return nothing
 end
 
 """
-    clear_geom(geoList::Vector{Geometry})
+    clear_geom(geoList::Vector{Geometry}; render=false)
 
     Removes the specified list of geometries from the voxel voxel.
     
     # Arguments
     - `geoList::Vector{Geometry}`: The list of geometries to be removed.
 """
-function clear_geom(geoList::Vector{Geometry})
-
+function clear_geom(geoList::Vector{Geometry}; render=false)
     for i in eachindex(geoList)
-        _del_geom(geoList[i], gridID)
+        clear_geom(geoList[i], render=render)
         geoList[i] = nothing
     end
+    return nothing
 end
 
 """

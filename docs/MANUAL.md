@@ -130,13 +130,14 @@ ___
 ### reset referecnce axes
 
 ```julia
-reset_ref(b::Bool)
+reset_ref(b::Bool, len::Float64=refLen[])
 ```
 
-Toggles the display of the reference axes at the origin. The default state is `true` (axes visible).
+Toggles the display of the reference axes at the origin. The default state is `true` (axes visible).Since the gird space is shifted, the voxel space will be reseted accordingly. Use this function before adding geomtries to the voxel space.
 
 #### Arguments
 - `b::Bool`: Boolean value to set the visibility of the reference axes.
+- `len::Float64=refLen[]`: reference length of the axes. The default is the minimum of the grid spacings.
 
 ___
 

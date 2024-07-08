@@ -7,7 +7,7 @@ function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
         react!(canvas, [mesh3d(x=0, y=0, z=0)], blank_layout())
     end
     if addRef
-        add_ref_axes!(canvas, [0, 0, 0], 1)
+        add_ref_axes!(canvas, [0, 0, 0], refLen[])
     end
 
     dx = voxel.dl[1]
@@ -86,7 +86,7 @@ function _plot_voxel(gridID::Array{Vector}, addRef::Bool=true)
             voxel_obj = polygons(ptsArray, 4, colorDict[idDict[id_list[ind][end]]])
     
             addtraces!(canvas, voxel_obj)
-            sleep(0.05)
+            sleep(0.1)
         end
     end
 end
@@ -121,10 +121,10 @@ function _add_geom(geo::Geometry, gridID::Array{Vector})
     y = collect(ymin:dy:ymax)
     z = collect(zmin:dz:zmax)
 
-    nx = Int((xmax - xmin) / dx + 1)
-    ny = Int((ymax - ymin) / dy + 1)
-    nz = Int((zmax - zmin) / dz + 1)
-
+    nx = round(Int, (xmax - xmin) / dx + 1)
+    ny = round(Int, (ymax - ymin) / dy + 1)
+    nz = round(Int, (zmax - zmin) / dz + 1)
+    
     gridID_new = Array{Vector}(undef, nx, ny, nz)
     for i in 1:nx, j in 1:ny, k in 1:nz
         gridID_new[i, j, k] = []
