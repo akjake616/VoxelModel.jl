@@ -1,7 +1,7 @@
 name = "VoxelModel"
 uuid = "4956fa17-11d8-4a0b-a900-0a865cb13992"
 authors = ["Jake W. Liu"]
-version = "2.1.0"
+version = "2.2.0"
 
 [deps]
 BatchAssign = "e837618a-1c15-48db-beb0-68297dffdb28"

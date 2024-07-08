@@ -19,7 +19,7 @@ colorDict[4] = "pink"
 
 sets the grids with index value `4` as pink voxels. If the key is not found, a random color is assigned. It is noted that key `0` is used for geometry deletion (please refer to  `ex_advanced.jl` in the examples folder). `ID` is a unique ID number (used for efficient identification of the geometries in the voxel space.
 
-Normally one does not need to deal with the `Geometry` struct directly. To add geometries, use API functions which starts with `craete_` to build geometries. `trans!` and `rot!` are used for translations and rotations of the created geometry.
+Normally one does not need to deal with the `Geometry` struct directly. To add geometries, use API functions which starts with `craete_` to build geometries. `trans!` and `rot!` are used for translations and rotations of the created geometry. It is noted that there is a keyword `render` (default`=false`) determining whether to plot the voxel space according to the creation/operation of the geometries. Due to the time to first plot (TTFP) problem, it is recommended to complete all creations/operations first and then call `plot_voxel()` to see the reult.
 
 The `Voxels` struct represents the voxel space as a result of the present geometries. The struct is composed of `grid`, which stores the grid array with the integer index of the geometries (only the last added geometry is stored in `grid` if geometry collision occurs), with customizable grid spacing `dl` and start position `start` (default of `shift[]` is `true`):
 
@@ -46,7 +46,7 @@ If one needs to add extra traces on the voxel plot, the PlotlyJS Plot is exporte
 ### reset voxel space
 
 ```julia
-reset_voxel()
+reset_voxel(;render=false)
 ```
 
 Reset the full voxel space.
@@ -54,6 +54,8 @@ Reset the full voxel space.
 #### Arguments
 - None
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
 ___
 
 ### export voxel
@@ -171,7 +173,7 @@ ___
 ### create_cuboid
 
 ```julia
-create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2)
+create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2; render=false)
 ```
 
 Creates a cuboid with the specified parameters.
@@ -183,12 +185,15 @@ Creates a cuboid with the specified parameters.
 - `mode::String="corner"`: The mode specifying the cuboid's origin ("corner" or "center").
 - `fac::Real=2`: The interior densified factor according to the grid spacing.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### create_cube
 
 ```julia
-creat_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2)
+creat_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2; render=false)
 ```
 
 Creates a cube with the specified parameters.
@@ -200,12 +205,15 @@ Creates a cube with the specified parameters.
 - `mode::String="corner"`: The mode specifying the cube's origin ("corner" or "center").
 - `fac::Real=2`: The interior densified factor according to the grid spacing.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### create_sphere
 
 ```julia
-create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2)
+create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2; render=false)
 ```
 
 Creates a sphere with the specified parameters.
@@ -216,12 +224,15 @@ Creates a sphere with the specified parameters.
 - `ind::Int=1`: The color index of the sphere.
 - `fac::Real=2`: The interior densified factor according to the grid spacing.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### create_ellipsoid
 
 ```julia
-create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2)
+create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2; render=false)
 ```
 
 Creates an ellipsoid with the specified parameters.
@@ -232,12 +243,15 @@ Creates an ellipsoid with the specified parameters.
 - `ind::Int=1`: The color index of the ellipsoid.
 - `fac::Real=2`: The interior densified factor according to the grid spacing.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### create_cylinder
 
 ```julia
-create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2)
+create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2; render=false)
 ```
 
 Creates a cylinder with the specified parameters.
@@ -249,12 +263,15 @@ Creates a cylinder with the specified parameters.
 - `ind::Int=1`: The color index of the cylinder.
 - `fac::Real=2`: The interior densified factor according to the grid spacing.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### trans!
 
 ```julia
-trans!(geo::Geometry, dl::Vector{<:Real})
+trans!(geo::Geometry, dl::Vector{<:Real}; render=false)
 ```
 
 Translates the geometry by the specified vector `dl`.
@@ -263,12 +280,15 @@ Translates the geometry by the specified vector `dl`.
 - `geo::Geometry`: The geometry to be translated.
 - `dl::Vector{<:Real}`: The translation vector.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### rot!
 
 ```julia
-rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0])
+rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0]; render=false)
 ```
 
 Rotates the geometry by the specified angle `ang` around the axis `axis` and origin `origin`.
@@ -279,12 +299,15 @@ Rotates the geometry by the specified angle `ang` around the axis `axis` and ori
 - `axis::Vector{<:Real}`: The rotation axis.
 - `origin::Vector{<:Real}=[0]`: The rotation origin. Defaults to the center of the geometry if not specified.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### clear_geom (single geometry)
 
 ```julia
-clear_geom(geo::Geometry)
+clear_geom(geo::Geometry; render=false)
 ```
 
 Removes the specified geometry from the voxel space.
@@ -292,18 +315,24 @@ Removes the specified geometry from the voxel space.
 #### Arguments
 - `geo::Geometry`: The geometry to be removed.
 
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
+
 ___
 
 ### clear_geom (multiple geometries)
 
 ```julia
-clear_geom(geoList::Vector{Geometry})
+clear_geom(geoList::Vector{Geometry}; render=false)
 ```
 
 Removes the specified list of geometries from the voxel space.
 
 #### Arguments
 - `geoList::Vector{Geometry}`: The list of geometries to be removed.
+
+#### Keywords
+- `render=false`: real-time rendering for creation/operation.
 
 ___
 

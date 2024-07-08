@@ -3,6 +3,9 @@
     reset_voxel(;render=false)
 
     Reset the full voxel voxel. 
+    
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
 """
 function reset_voxel(;render=false)
     global voxel = Voxels()
@@ -179,6 +182,9 @@ end
     - `ind::Int=1`: The color index of the cuboid.
     - `mode::String="corner"`: The mode specifying the cuboid's origin ("corner" or "center").
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
+    
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
 """
 function create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode="corner", fac::Real=2; render=false)
     @assert length(origin) == 3
@@ -230,6 +236,9 @@ end
     - `ind::Int=1`: The color index of the cube.
     - `mode::String="corner"`: The mode specifying the cube's origin ("corner" or "center").
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
+    
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
 """
 function create_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2; render=false)
     @assert dim > 0
@@ -246,7 +255,10 @@ end
     - `radius::Real`: The radius of the sphere.
     - `ind::Int=1`: The color index of the sphere.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
-"""
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
+    """
 function create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert fac > 0
@@ -290,7 +302,10 @@ end
     - `par::Vector{<:Real}`: The lengths of the semi-axes.
     - `ind::Int=1`: The color index of the ellipsoid.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
-"""
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
+    """
 function create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert length(par) == 3
@@ -336,7 +351,10 @@ end
     - `height::Real`: The height of the cylinder.
     - `ind::Int=1`: The color index of the cylinder.
     - `fac::Real=2`: The interior densified factor according to the grid spacing.
-"""
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
+    """
 function create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2; render=false)
     @assert length(origin) == 3
     @assert fac > 0
@@ -376,7 +394,10 @@ end
     # Arguments
     - `geo::Geometry`: The geometry to be translated.
     - `dl::Vector{<:Real}`: The translation vector.
-"""
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
+    """
 function trans!(geo::Geometry, dl::Vector{<:Real}; render=false)
     @assert length(dl) == 3
 
@@ -406,6 +427,9 @@ end
     - `ang::Real`: The rotation angle.
     - `axis::Vector{<:Real}`: The rotation axis.
     - `origin::Vector{<:Real}=[0]`: The rotation origin. Defaults to the center of the geometry if not specified.
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
 """
 function rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0]; render=false)
     @assert length(axis) == 3
@@ -442,6 +466,9 @@ end
     
     # Arguments
     - `geo::Geometry`: The geometry to be removed.
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
 """
 function clear_geom(geo::Geometry; render=false)
     _del_geom(geo, gridID)
@@ -459,6 +486,9 @@ end
     
     # Arguments
     - `geoList::Vector{Geometry}`: The list of geometries to be removed.
+
+    # Keywords
+    - `render=false`: real-time rendering for creation/operation.
 """
 function clear_geom(geoList::Vector{Geometry}; render=false)
     for i in eachindex(geoList)
