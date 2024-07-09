@@ -150,27 +150,44 @@ reset_shift(b::Bool)
 ```
 
 Sets the `shift[]` parameter to the specified boolean value `b`. 
+!! Since the gird space is changed, the voxel space will be reseted accordingly. Use this function before adding geomtries to the voxel space.
 
 #### Arguments
 - `b::Bool`: Boolean value to set the `shift[]` parameter.
 
 ___
 
-### reset_dl
+### reset grid spacings
 
 ```julia
 reset_dl(dl::Vector{<:Real})
 ```
 
 Resets the grid spacing to the specified vector `dl`. 
+!! Since the gird space is changed, the voxel space will be reseted accordingly. Use this function before adding geomtries to the voxel space.
 Updates: One can also set `dl` as a real number for equal spacings.
+
 
 #### Arguments
 - `dl::Vector{<:Real}`: A vector containing the new grid spacing values.
 
 ___
 
-### create_cuboid
+### reset start
+
+```julia
+reset_start(start::Vector{<:Real})
+```
+
+reset the start point of the voxel space. 
+!! Note that th spart point is ceiled to the neasrest grid center.
+    
+#### Arguments
+- `start::Vector{<:Real}`: A vector indicating the spart point.
+
+___
+
+### create cuboid
 
 ```julia
 create_cuboid(origin::Vector{<:Real}, dim::Vector{<:Real}, ind::Int=1, mode::String="corner", fac::Real=2; render=false)
@@ -190,7 +207,7 @@ Creates a cuboid with the specified parameters.
 
 ___
 
-### create_cube
+### create cube
 
 ```julia
 creat_cube(origin::Vector{<:Real}, dim::Real, ind::Int=1, mode="corner", fac::Real=2; render=false)
@@ -210,7 +227,7 @@ Creates a cube with the specified parameters.
 
 ___
 
-### create_sphere
+### create sphere
 
 ```julia
 create_sphere(origin::Vector{<:Real}, radius::Real, ind::Int=1, fac::Real=2; render=false)
@@ -229,7 +246,7 @@ Creates a sphere with the specified parameters.
 
 ___
 
-### create_ellipsoid
+### create ellipsoid
 
 ```julia
 create_ellipsoid(origin::Vector{<:Real}, par::Vector{<:Real}, ind::Int=1, fac::Real=2; render=false)
@@ -248,7 +265,7 @@ Creates an ellipsoid with the specified parameters.
 
 ___
 
-### create_cylinder
+### create cylinder
 
 ```julia
 create_cylinder(origin::Vector{<:Real}, radius::Real, height::Real, ind::Int=1, fac::Real=2; render=false)
@@ -268,7 +285,7 @@ Creates a cylinder with the specified parameters.
 
 ___
 
-### trans!
+### translation
 
 ```julia
 trans!(geo::Geometry, dl::Vector{<:Real}; render=false)
@@ -285,7 +302,7 @@ Translates the geometry by the specified vector `dl`.
 
 ___
 
-### rot!
+### rotation
 
 ```julia
 rot!(geo::Geometry, ang::Real, axis::Vector{<:Real}, origin::Vector{<:Real}=[0]; render=false)
@@ -304,7 +321,7 @@ Rotates the geometry by the specified angle `ang` around the axis `axis` and ori
 
 ___
 
-### clear_geom (single geometry)
+### clear geometry (single geometry)
 
 ```julia
 clear_geom(geo::Geometry; render=false)
@@ -320,7 +337,7 @@ Removes the specified geometry from the voxel space.
 
 ___
 
-### clear_geom (multiple geometries)
+### clear geometry (multiple geometries)
 
 ```julia
 clear_geom(geoList::Vector{Geometry}; render=false)
@@ -337,7 +354,7 @@ Removes the specified list of geometries from the voxel space.
 ___
 
 
-### export_grid
+### export grid
 
 ```julia
 export_grid()

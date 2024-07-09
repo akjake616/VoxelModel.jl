@@ -129,7 +129,7 @@ function _add_geom(geo::Geometry, gridID::Array{Vector})
     for i in 1:nx, j in 1:ny, k in 1:nz
         gridID_new[i, j, k] = []
     end
-
+    
     if !isempty(gridID)
         for i in 1:ngx, j in 1:ngy, k in 1:ngz
             gridID_new[findfirst(x .== voxel.start[1])+(i-1), findfirst(y .== voxel.start[2])+(j-1), findfirst(z .== voxel.start[3])+(k-1)] = gridID[i, j, k]

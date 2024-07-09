@@ -117,7 +117,7 @@ end
     reset_shift(b::Bool)
 
     Sets the `shift[]` parameter to the specified boolean value `b`. 
-    Since the gird space is shifted, the voxel space will be reseted accordingly. 
+    !! Since the gird space is changed, the voxel space will be reseted accordingly. 
     Use this function before adding geomtries to the voxel space.
     
     # Arguments
@@ -125,7 +125,7 @@ end
 """
 function reset_shift(b::Bool)
     shift[] = b
-    global voxel = Voxels()
+    reset_voxel()
     return nothing
 end
 
@@ -133,6 +133,8 @@ end
     reset_dl(dl::Vector{<:Real})
 
     Updates the grid spacing to the specified vector `dl`.
+    !! Since the gird space is changed, the voxel space will be reseted accordingly. 
+    Use this function before adding geomtries to the voxel space.
     
     # Arguments
     - `dl::Vector{<:Real}`: A vector containing the new grid spacing values.
@@ -140,8 +142,9 @@ end
 function reset_dl(dl::Vector{<:Real})
     @assert length(dl) == 3
     @assert all(>(0), dl)
+    reset_voxel()
     voxel.dl = dl
-    reset_start([0, 0, 0])
+    reset_start([0.0, 0.0, 0.0])
     reset_ref(true, minimum(dl))
     return nothing
 end
@@ -153,7 +156,8 @@ end
 """
     reset_start(start::Vector{<:Real})
 
-    reset the start point of the voxel space. Note that th spart point is rounded to the neasrest grid center.
+    reset the start point of the voxel space. 
+    !! Note that th spart point is ceiled to the neasrest grid center.
     
     # Arguments
     - `start::Vector{<:Real}`: A vector indicating the spart point.
@@ -164,9 +168,9 @@ function reset_start(start::Vector{<:Real})
     dy = voxel.dl[2]
     dz = voxel.dl[3]
     
-    xmin = _round((start[1] - shift[]*dx/2)/dx)*dx + shift[]*dx/2
-    ymin = _round((start[2] - shift[]*dy/2)/dy)*dy + shift[]*dy/2
-    zmin = _round((start[3] - shift[]*dz/2)/dz)*dz + shift[]*dz/2
+    xmin = ceil((start[1] - shift[]*dx/2)/dx)*dx + shift[]*dx/2
+    ymin = ceil((start[2] - shift[]*dy/2)/dy)*dy + shift[]*dy/2
+    zmin = ceil((start[3] - shift[]*dz/2)/dz)*dz + shift[]*dz/2
     voxel.start = [xmin, ymin, zmin]
     return nothing
 end
