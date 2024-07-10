@@ -77,7 +77,7 @@ function plot_voxel(addRef::Bool=true)
 end
 
 """
-assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5])
+assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[0, 0, 0])
 
     Assign grid to voxel space.
     
@@ -86,10 +86,10 @@ assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vec
     - `dl::Vector{<:Real}=[1.0, 1.0, 1.0]`: grid spacings.
     - `start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5]`: start point.
 """
-function assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[shift[] * 0.5, shift[] * 0.5, shift[] * 0.5])
-    global voxel.grid = grid
+function assign_voxel(grid::Array{Int, 3}, dl::Vector{<:Real}=[1.0, 1.0, 1.0], start::Vector{<:Real}=[0, 0, 0])
     reset_dl(dl)
     reset_start(start)
+    global voxel.grid = grid
     _reset_gridID()
     return nothing
 end
