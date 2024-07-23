@@ -99,7 +99,7 @@ function assign_voxel(grid::Array{Int, 3}, dl::Real, start::Vector{<:Real}=[shif
 end
 
 """
-    reset_ref(b::Bool, len::Float64=refLen[])
+    reset_ref(b::Bool, len::Real=refLen[])
 
     Toggles the display of the reference axes at the origin. The default state is `true` (axes visible).
     
@@ -107,9 +107,9 @@ end
     - `b::Bool`: Boolean value to set the visibility of the reference axes.
     - `len::Float64=refLen[]`: reference length of the axes. The default is the minimum of the grid spacings.
 """
-function reset_ref(b::Bool, len::Float64=refLen[])
+function reset_ref(b::Bool, len::Real=refLen[])
     refAxis[] = b
-    refLen[] = len
+    refLen[] = Float64(len)
     return nothing
 end
 
